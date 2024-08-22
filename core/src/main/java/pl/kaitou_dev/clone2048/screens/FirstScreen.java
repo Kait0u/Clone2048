@@ -1,4 +1,4 @@
-package pl.kaitou_dev.clone2048;
+package pl.kaitou_dev.clone2048.screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import pl.kaitou_dev.clone2048.Constants;
 
 /** First screen of the application. Displayed after the application is created. */
 public class FirstScreen implements Screen {
