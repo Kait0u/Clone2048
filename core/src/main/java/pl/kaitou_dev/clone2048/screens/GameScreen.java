@@ -1,6 +1,8 @@
 package pl.kaitou_dev.clone2048.screens;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -44,9 +46,10 @@ public class GameScreen implements Screen {
 
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
-        spriteBatch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        spriteBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         gameGrid = new GameGrid();
+        gameGrid.setCoords(Constants.GAME_WIDTH / 2 - GameGrid.SIZE / 2, Constants.GAME_HEIGHT / 2 - GameGrid.SIZE / 2);
 
 
         Pixmap pm = PixmapUtils.getRoundRectPixmap(w, h, w / 5, Color.VIOLET);
@@ -68,9 +71,17 @@ public class GameScreen implements Screen {
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
 //        spriteBatch.draw(tx, Constants.GAME_WIDTH / 2 - w / 2, Constants.GAME_HEIGHT / 2 - h / 2);
-        gameGrid.drawGrid(spriteBatch, Constants.GAME_WIDTH / 2 - GameGrid.SIZE / 2, Constants.GAME_HEIGHT / 2 - GameGrid.SIZE / 2);
+        gameGrid.drawGrid(spriteBatch);
         gameGrid.drawBoxes(spriteBatch);
         spriteBatch.end();
+
+        handleInput();
+    }
+
+    private void handleInput() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            gameGrid.addNewBox();
+        }
     }
 
     @Override
