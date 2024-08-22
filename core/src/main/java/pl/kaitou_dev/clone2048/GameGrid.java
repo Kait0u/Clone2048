@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Disposable;
@@ -26,6 +27,9 @@ public class GameGrid implements Disposable {
 
     // Geometry
     int posX, posY;
+
+    // TO DELETE
+    BitmapFont font = new BitmapFont();
 
 
     public GameGrid() {
@@ -52,6 +56,7 @@ public class GameGrid implements Disposable {
                 int y = yBot + SIZE - (GRID_PADDING + SLOT_SPACING * r + SLOT_SIZE * (r + 1));
 
                 batch.draw(txGridSlot, x, y);
+                font.draw(batch, "R=" + r + ", C=" + c, x, y + SLOT_SIZE / 2);
             }
         }
     }
