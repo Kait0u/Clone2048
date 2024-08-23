@@ -37,10 +37,6 @@ public class GameGrid implements Disposable {
     // Geometry
     int posX, posY;
 
-    // TO DELETE
-    BitmapFont font = new BitmapFont();
-
-
     public GameGrid() {
         grid = new NumberBox[GRID_SIDE][GRID_SIDE];
         boxesToRemove = new ArrayList<>();
@@ -321,11 +317,6 @@ public class GameGrid implements Disposable {
 
             Vector2 boxCoords = getSlotCoords(r, c);
             newBox.setCoords((int) boxCoords.x, (int) boxCoords.y);
-
-            System.out.println(this);
-            for (Directions direction : Directions.values()) {
-                System.out.println(direction.toString().concat(" - ") + isMovementPossible(direction));
-            }
         }
 
         return indices != null;
@@ -364,8 +355,6 @@ public class GameGrid implements Disposable {
 
                 int x = (int) coords.x, y = (int) coords.y;
                 batch.draw(txGridSlot, x, y);
-
-                font.draw(batch, "R=" + r + ", C=" + c, x, y + Constants.SLOT_SIZE / 2);
             }
         }
     }

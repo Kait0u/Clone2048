@@ -43,7 +43,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        System.out.println(gameGrid);
+
     }
 
     @Override

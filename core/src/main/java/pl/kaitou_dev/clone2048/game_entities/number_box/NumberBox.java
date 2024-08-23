@@ -35,9 +35,9 @@ public class NumberBox {
         this.value = value;
         this.grid = grid;
 
-        texture = new Texture(PixmapUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, Color.BLUE));
+        texture = new Texture(PixmapUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, Color.SKY));
         font = FontUtils.firaCodeRegular(40);
-        font.setColor(Color.WHITE);
+        font.setColor(Color.BLACK);
         layout = new GlyphLayout();
     }
 
