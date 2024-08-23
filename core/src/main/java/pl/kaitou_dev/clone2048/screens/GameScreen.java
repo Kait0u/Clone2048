@@ -6,12 +6,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import pl.kaitou_dev.clone2048.Constants;
-import pl.kaitou_dev.clone2048.GameGrid;
-import pl.kaitou_dev.clone2048.utils.PixmapUtils;
+import pl.kaitou_dev.clone2048.game_entities.Directions;
+import pl.kaitou_dev.clone2048.game_entities.GameGrid;
 
 public class GameScreen implements Screen {
     private Game game;
@@ -19,22 +18,13 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private FitViewport viewport;
 
-    private ShapeRenderer shapeRenderer;
     private SpriteBatch spriteBatch;
+
+
+    // Game objects
 
     private GameGrid gameGrid;
 
-    ///////////////////////////////////////
-    // TO DELETE
-    ///////////////////////////////////////
-
-
-    Texture tx;
-    int w = 200, h = 200;
-
-    ///////////////////////////////////////
-    // END TO DELETE
-    ///////////////////////////////////////
 
     public GameScreen(Game game) {
         this.game = game;
@@ -44,19 +34,11 @@ public class GameScreen implements Screen {
 
         viewport = new FitViewport(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, camera);
 
-        shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
         spriteBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         gameGrid = new GameGrid();
         gameGrid.setCoords(Constants.GAME_WIDTH / 2 - GameGrid.SIZE / 2, Constants.GAME_HEIGHT / 2 - GameGrid.SIZE / 2);
-
-
-        Pixmap pm = PixmapUtils.getRoundRectPixmap(w, h, w / 5, Color.VIOLET);
-        tx = new Texture(pm);
-        tx.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        tx.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-        pm.dispose();
     }
 
     @Override
@@ -68,9 +50,10 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(new Color(0xFFFFFFFF));
 
+        gameGrid.update(delta);
+
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
-//        spriteBatch.draw(tx, Constants.GAME_WIDTH / 2 - w / 2, Constants.GAME_HEIGHT / 2 - h / 2);
         gameGrid.drawGrid(spriteBatch);
         gameGrid.drawBoxes(spriteBatch);
         spriteBatch.end();
@@ -81,6 +64,22 @@ public class GameScreen implements Screen {
     private void handleInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             gameGrid.addNewBox();
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+            gameGrid.move(Directions.UP);
+        }
+
+        else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+            gameGrid.move(Directions.DOWN);
+        }
+
+        else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+            gameGrid.move(Directions.LEFT);
+        }
+
+        else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+            gameGrid.move(Directions.RIGHT);
         }
     }
 
@@ -107,7 +106,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        tx.dispose();
         spriteBatch.dispose();
     }
 }

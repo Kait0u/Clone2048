@@ -1,4 +1,4 @@
-package pl.kaitou_dev.clone2048;
+package pl.kaitou_dev.clone2048.game_entities;
 
 public enum Directions {
     UP, DOWN, LEFT, RIGHT;
