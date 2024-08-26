@@ -1,5 +1,7 @@
 package pl.kaitou_dev.clone2048.game_entities;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,9 +15,8 @@ import pl.kaitou_dev.clone2048.game_entities.number_box.NumberBox;
 import pl.kaitou_dev.clone2048.utils.MathNumUtils;
 import pl.kaitou_dev.clone2048.utils.PixmapUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
+import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
 
 public class GameGrid implements Disposable {
@@ -28,6 +29,7 @@ public class GameGrid implements Disposable {
     private NumberBox[][] grid;
     private ArrayList<NumberBox> boxesToRemove;
     private int secretNumber;
+    private Map<Directions, Boolean> movementPossibilities;
     private boolean movementInProgress;
 
 
@@ -41,6 +43,8 @@ public class GameGrid implements Disposable {
         grid = new NumberBox[GRID_SIDE][GRID_SIDE];
         boxesToRemove = new ArrayList<>();
         secretNumber = MathNumUtils.randInt(1, 11);
+        movementPossibilities = Collections.synchronizedMap(new HashMap<>());
+        updateLegalMoves();
 
         Pixmap pmGridBackground = PixmapUtils.getRoundRectPixmap(SIZE, SIZE, SIZE * 5 / 100, Color.DARK_GRAY);
         txGridBackground = new Texture(pmGridBackground);
@@ -71,24 +75,50 @@ public class GameGrid implements Disposable {
         }
     }
 
-    public boolean move(Directions direction) {
-        switch (direction) {
-            case DOWN -> {
-                moveDown();
-            }
-            case UP -> {
-                moveUp();
-            }
-            case LEFT -> {
-                moveLeft();
-            }
-            case RIGHT -> {
-                moveRight();
-            }
+    public void handleInput() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+            handleMovement(Directions.UP);
         }
 
-        addNewBox();
-        return false;
+        else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+            handleMovement(Directions.DOWN);
+        }
+
+        else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+            handleMovement(Directions.LEFT);
+        }
+
+        else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+            handleMovement(Directions.RIGHT);
+        }
+    }
+
+    private void updateLegalMoves() {
+        Arrays.stream(Directions.values()).parallel()
+            .forEach(direction -> movementPossibilities.put(direction, isMovementPossible(direction)));
+    }
+
+    public void handleMovement(Directions direction) {
+        if (movementPossibilities.get(direction)) {
+            move(direction);
+            addNewBox();
+            updateLegalMoves();
+
+            for (Directions d: Directions.values()) {
+                System.out.println(d + " - " + movementPossibilities.get(d));
+            }
+
+            System.out.println("=".repeat(20));
+        }
+    }
+
+    public void move(Directions direction) {
+        switch (direction) {
+            case DOWN ->  moveDown();
+            case UP -> moveUp();
+            case LEFT -> moveLeft();
+            case RIGHT -> moveRight();
+        }
     }
 
     private void moveUp() {
@@ -223,39 +253,24 @@ public class GameGrid implements Disposable {
     }
 
     public boolean isMovementPossible(Directions direction) {
+        IntPredicate boundaryPredicate = switch(direction) {
+            case UP, LEFT -> (v -> v < GRID_SIDE - 1);
+            case DOWN, RIGHT -> (v -> v > 0);
+        };
+
         for (int r = 0; r < GRID_SIDE; ++r) {
             for (int c = 0; c < GRID_SIDE; ++c) {
                 NumberBox consideredBox = grid[r][c];
-                HashMap<Directions, NumberBox> neighbors = getNeighbors(r, c);
+                NumberBox neighbor = getNeighbor(r, c, direction);
 
-                switch (direction) {
-                    case UP -> {
-                        if (r > 0 && consideredBox == null) return true;
+                int boundaryTestVal = switch (direction) {
+                    case UP, DOWN -> r;
+                    case LEFT, RIGHT -> c;
+                };
 
-                        NumberBox upNeighbor = neighbors.get(direction);
-                        if (consideredBox != null && consideredBox.equals(upNeighbor))
-                            return true;
-                    }
-                    case DOWN -> {
-                        if (r < GRID_SIDE - 1 && consideredBox == null) return true;
-
-                        NumberBox downNeighbor = neighbors.get(direction);
-                        if (consideredBox != null && consideredBox.equals(downNeighbor))
-                            return true;
-                    }
-                    case LEFT -> {
-                        if (c < GRID_SIDE - 1 && consideredBox == null) return true;
-                        NumberBox leftNeighbor = neighbors.get(direction);
-                        if (consideredBox != null && consideredBox.equals(leftNeighbor))
-                            return true;
-                    }
-                    case RIGHT -> {
-                        if (c > 0 && consideredBox == null) return true;
-                        NumberBox rightNeighbor = neighbors.get(direction);
-                        if (consideredBox != null && consideredBox.equals(rightNeighbor))
-                            return true;
-                    }
-                }
+                if (consideredBox == null) {
+                    if (boundaryPredicate.test(boundaryTestVal)) return true;
+                } else if (consideredBox.equals(neighbor)) return true;
             }
         }
 
@@ -282,13 +297,21 @@ public class GameGrid implements Disposable {
         return null;
     }
 
+    public NumberBox getNeighbor(int row, int col, Directions side) {
+        return switch(side) {
+            case DOWN -> (row - 1 >= 0) ? grid[row - 1][col] : null;
+            case UP -> (row + 1 < GRID_SIDE) ? grid[row + 1][col] : null;
+            case LEFT -> (col - 1 >= 0) ? grid[row][col - 1] : null;
+            case RIGHT -> (col + 1 < GRID_SIDE) ? grid[row][col + 1] : null;
+            default -> null;
+        };
+    }
+
     public HashMap<Directions, NumberBox> getNeighbors(int row, int col) {
         HashMap<Directions, NumberBox> neighbors = new HashMap<>();
 
-        neighbors.put(Directions.UP, (row - 1 >= 0) ? grid[row - 1][col] : null);
-        neighbors.put(Directions.DOWN, (row + 1 < GRID_SIDE) ? grid[row + 1][col] : null);
-        neighbors.put(Directions.LEFT, (col - 1 >= 0) ? grid[row][col - 1] : null);
-        neighbors.put(Directions.RIGHT, (col + 1 < GRID_SIDE) ? grid[row][col + 1] : null);
+        for (Directions direction: Directions.values())
+            neighbors.put(direction, getNeighbor(row, col, direction));
 
         return neighbors;
     }

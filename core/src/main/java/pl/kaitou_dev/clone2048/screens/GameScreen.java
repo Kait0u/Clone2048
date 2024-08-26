@@ -66,21 +66,7 @@ public class GameScreen implements Screen {
             gameGrid.addNewBox();
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            gameGrid.move(Directions.UP);
-        }
-
-        else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            gameGrid.move(Directions.DOWN);
-        }
-
-        else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            gameGrid.move(Directions.LEFT);
-        }
-
-        else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            gameGrid.move(Directions.RIGHT);
-        }
+        gameGrid.handleInput();
     }
 
     @Override
