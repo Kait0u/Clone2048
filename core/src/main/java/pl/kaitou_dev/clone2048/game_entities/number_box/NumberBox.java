@@ -18,13 +18,19 @@ public class NumberBox {
     private int value;
     private GameGrid grid;
 
+
     private int posX, posY;
     private BoxAction action;
 
-    private static BitmapFont font;
+    private BitmapFont font;
 
     private Texture texture;
+    private BoxColorPalette colorPalette;
+    private Color bgColor = Color.SKY;
+    private Color fontColor = Color.BLACK;
+
     private GlyphLayout layout;
+
 
     double scale = 1.0;
 
@@ -35,11 +41,17 @@ public class NumberBox {
         this.value = value;
         this.grid = grid;
 
-        texture = new Texture(PixmapUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, Color.SKY));
+        colorPalette = this.grid.getPalette();
+        updateColors(false);
+
+        texture = new Texture(PixmapUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, bgColor));
+
         font = FontUtils.firaCodeRegular(40);
-        font.setColor(Color.BLACK);
+        updateFontColor();
+
         layout = new GlyphLayout();
     }
+
 
     public void draw(Batch batch) {
         batch.draw(texture, posX, posY, (float) (texture.getWidth() * scale), (float) (texture.getHeight() * scale));
@@ -59,6 +71,7 @@ public class NumberBox {
 
     public void upgrade() {
         value <<= 1;
+        updateColors(true);
     }
 
     @Override
@@ -115,5 +128,25 @@ public class NumberBox {
 
         if (action.isDone())
             action = null;
+    }
+
+    private void updateColors(boolean cascade) {
+        if (colorPalette != null) {
+            bgColor = colorPalette.getColor(value);
+            fontColor = colorPalette.getFontColor(bgColor);
+
+            if (cascade) {
+                updateTexture();
+                updateFontColor();
+            }
+        }
+    }
+
+    private void updateTexture() {
+        texture = new Texture(PixmapUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, bgColor));
+    }
+
+    private void updateFontColor() {
+        font.setColor(fontColor);
     }
 }

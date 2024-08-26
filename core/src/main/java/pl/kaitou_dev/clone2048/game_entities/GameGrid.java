@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import pl.kaitou_dev.clone2048.Constants;
+import pl.kaitou_dev.clone2048.game_entities.number_box.BoxColorPalette;
 import pl.kaitou_dev.clone2048.game_entities.number_box.NumberBox;
 import pl.kaitou_dev.clone2048.utils.MathNumUtils;
 import pl.kaitou_dev.clone2048.utils.PixmapUtils;
@@ -34,8 +35,9 @@ public class GameGrid implements Disposable {
     private boolean movementInProgress;
 
 
-    // Textures
+    // Textures & Graphics
     Texture txGridBackground, txGridSlot;
+    BoxColorPalette palette = BoxColorPalette.COLORFUL;
 
     // Geometry
     int posX, posY;
@@ -442,5 +444,9 @@ public class GameGrid implements Disposable {
                 box.setCoords((int) slotCoords.x, (int) slotCoords.y);
             });
         });
+    }
+
+    public BoxColorPalette getPalette() {
+        return palette;
     }
 }
