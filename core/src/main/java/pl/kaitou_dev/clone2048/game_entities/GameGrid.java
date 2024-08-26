@@ -18,6 +18,7 @@ import pl.kaitou_dev.clone2048.utils.PixmapUtils;
 import java.util.*;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class GameGrid implements Disposable {
     private static final int GRID_SIDE = 4;
@@ -53,6 +54,8 @@ public class GameGrid implements Disposable {
         Pixmap pmGridSlot = PixmapUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, Color.LIGHT_GRAY);
         txGridSlot = new Texture(pmGridSlot);
         pmGridSlot.dispose();
+
+        addNewBox();
     }
 
     public void update(float delta) {
@@ -425,5 +428,19 @@ public class GameGrid implements Disposable {
     public void setCoords(int x, int y) {
         posX = x;
         posY = y;
+
+        updateBoxCoords();
+    }
+
+    private void updateBoxCoords() {
+        IntStream.range(0, GRID_SIDE).parallel().forEach(r -> {
+            IntStream.range(0, GRID_SIDE).parallel().forEach(c -> {
+                NumberBox box = grid[r][c];
+                if (box == null) return;
+
+                Vector2 slotCoords = getSlotCoords(r, c);
+                box.setCoords((int) slotCoords.x, (int) slotCoords.y);
+            });
+        });
     }
 }
