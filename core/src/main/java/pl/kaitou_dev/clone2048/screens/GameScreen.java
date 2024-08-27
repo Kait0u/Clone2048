@@ -36,21 +36,17 @@ public class GameScreen implements Screen {
 
         spriteBatch = new SpriteBatch();
         spriteBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    }
 
+    @Override
+    public void show() {
         gameGrid = new GameGrid();
         gameGrid.setCoords(Constants.GAME_WIDTH / 2 - GameGrid.SIZE / 2, Constants.GAME_HEIGHT / 2 - GameGrid.SIZE / 2);
     }
 
     @Override
-    public void show() {
-
-    }
-
-    @Override
     public void render(float delta) {
         ScreenUtils.clear(new Color(0xFFFFFFFF));
-
-        gameGrid.update(delta);
 
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
@@ -58,7 +54,18 @@ public class GameScreen implements Screen {
         gameGrid.drawBoxes(spriteBatch);
         spriteBatch.end();
 
+        update(delta);
+
         handleInput();
+    }
+
+    private void update(float delta) {
+        gameGrid.update(delta);
+
+        if (gameGrid.isGameOver()) {
+            game.setScreen(new FirstScreen(game));
+            dispose();
+        }
     }
 
     private void handleInput() {
@@ -92,6 +99,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
+        gameGrid.dispose();
         spriteBatch.dispose();
     }
 }

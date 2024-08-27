@@ -10,4 +10,9 @@ public class Clone2048 extends Game {
     public void create() {
         setScreen(new FirstScreen(this));
     }
+
+    @Override
+    public void render() {
+        super.render();
+    }
 }

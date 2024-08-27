@@ -32,7 +32,12 @@ public class GameGrid implements Disposable {
     private ArrayList<NumberBox> boxesToRemove;
     private int secretNumber;
     private Map<Directions, Boolean> movementPossibilities;
-    private boolean movementInProgress;
+
+    private enum State {
+            IDLE, BUSY, GAME_OVER;
+    }
+
+    private State state = State.IDLE;
 
 
     // Textures & Graphics
@@ -58,13 +63,18 @@ public class GameGrid implements Disposable {
         pmGridSlot.dispose();
 
         addNewBox();
+        System.out.println("GameGrid created!");
     }
 
     public void update(float delta) {
+        state = State.IDLE;
+
         for (NumberBox[] row : grid) {
             for (NumberBox box : row) {
-                if (box != null)
+                if (box != null) {
                     box.update(delta);
+                    if (box.isBusy()) state = State.BUSY;
+                }
             }
         }
 
@@ -73,10 +83,22 @@ public class GameGrid implements Disposable {
         while (itBoxesToRemove.hasNext()) {
             NumberBox box = (NumberBox) itBoxesToRemove.next();
 
-            if (box.isBusy())
+            if (box.isBusy()) {
                 box.update(delta);
-            else
+                state = State.BUSY;
+            }
+
+            else {
                 itBoxesToRemove.remove();
+                box.dispose();
+            }
+
+        }
+
+        // Check if game should end
+        if (state == State.IDLE) {
+            boolean anyMovementPossible = movementPossibilities.values().stream().anyMatch(Boolean::booleanValue);
+            if (!anyMovementPossible) state = State.GAME_OVER;
         }
     }
 
@@ -104,16 +126,12 @@ public class GameGrid implements Disposable {
     }
 
     public void handleMovement(Directions direction) {
+        if (state == State.BUSY) return;
+
         if (movementPossibilities.get(direction)) {
             move(direction);
             addNewBox();
             updateLegalMoves();
-
-            for (Directions d: Directions.values()) {
-                System.out.println(d + " - " + movementPossibilities.get(d));
-            }
-
-            System.out.println("=".repeat(20));
         }
     }
 
@@ -410,6 +428,15 @@ public class GameGrid implements Disposable {
     public void dispose() {
         txGridBackground.dispose();
         txGridSlot.dispose();
+        for (NumberBox[] row : grid) {
+            for (NumberBox box : row) {
+                if (box != null) box.dispose();
+            }
+        }
+
+        for (NumberBox box : boxesToRemove) {
+            box.dispose();
+        }
     }
 
 
@@ -448,5 +475,9 @@ public class GameGrid implements Disposable {
 
     public BoxColorPalette getPalette() {
         return palette;
+    }
+
+    public boolean isGameOver() {
+        return state == State.GAME_OVER;
     }
 }

@@ -143,10 +143,17 @@ public class NumberBox {
     }
 
     private void updateTexture() {
+        if (texture != null) texture.dispose();
         texture = new Texture(PixmapUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, bgColor));
     }
 
     private void updateFontColor() {
         font.setColor(fontColor);
+    }
+
+
+    public void dispose() {
+        if (texture != null) texture.dispose();
+        if (font != null) font.dispose();
     }
 }

@@ -48,8 +48,6 @@ public class BoxColorPalette {
         float b = color.b;
 
         double luminance = calculateLuminance(r, g, b);
-
-        System.out.println(color + " - " + luminance + " " + (luminance < LUMINANCE_THRESHOLD));
         fontColors.put(color, luminance < LUMINANCE_THRESHOLD ? Color.WHITE : Color.BLACK);
     }
 
