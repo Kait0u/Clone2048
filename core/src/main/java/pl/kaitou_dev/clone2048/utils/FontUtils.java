@@ -21,7 +21,11 @@ public class FontUtils {
 
     }
 
-    public static BitmapFont firaCodeRegular(int size) {
+    public static BitmapFont losevka(int size) {
         return getFont("fonts/losevka.ttf", size);
+    }
+
+    public static BitmapFont monofett(int size) {
+        return getFont("fonts/Monofett-Regular.ttf", size);
     }
 }

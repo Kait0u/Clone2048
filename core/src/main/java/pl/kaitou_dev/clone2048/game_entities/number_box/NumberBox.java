@@ -46,7 +46,7 @@ public class NumberBox {
 
         texture = new Texture(PixmapUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, bgColor));
 
-        font = FontUtils.firaCodeRegular(40);
+        font = FontUtils.losevka(40);
         updateFontColor();
 
         layout = new GlyphLayout();
