@@ -1,15 +1,16 @@
 package pl.kaitou_dev.clone2048.game_entities.number_box.actions;
 
-import com.badlogic.gdx.math.Vector2;
 import pl.kaitou_dev.clone2048.game_entities.number_box.NumberBox;
+import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
 
 public class BoxMoveAction extends BoxAction {
     private int destX, destY, startX, startY;
     private float durationSeconds;
     private float elapsedSeconds;
 
-    public BoxMoveAction(NumberBox box, int destX, int destY, float durationSeconds) {
-        super(box);
+    public BoxMoveAction(NumberBox box, int destX, int destY, float durationSeconds, Interpolator interpolator) {
+        super(box, interpolator);
+
         this.destX = destX;
         this.destY = destY;
         this.durationSeconds = durationSeconds;
@@ -19,12 +20,8 @@ public class BoxMoveAction extends BoxAction {
         this.startY = box.getPosY();
     }
 
-    public BoxMoveAction(NumberBox box, Vector2 destination, float durationSeconds) {
-        this(box, (int) destination.x, (int) destination.y, durationSeconds);
-    }
-
-    public BoxMoveAction(NumberBox box) {
-        super(box);
+    public BoxMoveAction(NumberBox box, int destX, int destY, float durationSeconds) {
+        this(box, destX, destY, durationSeconds, null);
     }
 
     @Override
@@ -37,9 +34,8 @@ public class BoxMoveAction extends BoxAction {
             return;
         }
 
-        float t = elapsedSeconds / durationSeconds;
-        int x = (int) (startX + (destX - startX) * t);
-        int y = (int) (startY + (destY - startY) * t);
+        int x = (int) interpolator.interpolate(startX, destX, elapsedSeconds, durationSeconds);
+        int y = (int) interpolator.interpolate(startY, destY, elapsedSeconds, durationSeconds);
         box.setCoords(x, y);
     }
 }

@@ -15,6 +15,8 @@ import pl.kaitou_dev.clone2048.game_entities.number_box.BoxColorPalette;
 import pl.kaitou_dev.clone2048.game_entities.number_box.NumberBox;
 import pl.kaitou_dev.clone2048.utils.MathNumUtils;
 import pl.kaitou_dev.clone2048.utils.PixmapUtils;
+import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
+import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolators;
 
 import java.util.*;
 import java.util.function.IntPredicate;
@@ -63,7 +65,6 @@ public class GameGrid implements Disposable {
         pmGridSlot.dispose();
 
         addNewBox();
-        System.out.println("GameGrid created!");
     }
 
     public void update(float delta) {
@@ -171,7 +172,7 @@ public class GameGrid implements Disposable {
                     }
                 }
                 Vector2 coords = getSlotCoords(newR, c);
-                consideredBox.moveLinear((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED);
+                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, Interpolators.QUADRATIC);
             }
         }
     }
@@ -204,7 +205,7 @@ public class GameGrid implements Disposable {
                     }
                 }
                 Vector2 coords = getSlotCoords(newR, c);
-                consideredBox.moveLinear((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED);
+                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, Interpolators.QUADRATIC);
             }
         }
     }
@@ -237,7 +238,7 @@ public class GameGrid implements Disposable {
                     }
                 }
                 Vector2 coords = getSlotCoords(r, newC);
-                consideredBox.moveLinear((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED);
+                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, Interpolators.QUADRATIC);
             }
         }
     }
@@ -270,7 +271,7 @@ public class GameGrid implements Disposable {
                     }
                 }
                 Vector2 coords = getSlotCoords(r, newC);
-                consideredBox.moveLinear((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED);
+                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, Interpolators.QUADRATIC);
             }
         }
     }

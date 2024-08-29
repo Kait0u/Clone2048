@@ -1,31 +1,24 @@
 package pl.kaitou_dev.clone2048.game_entities.number_box.actions;
 
-import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.number_box.NumberBox;
+import pl.kaitou_dev.clone2048.utils.timed_actions.Action;
+import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
 
-public class BoxAction {
+public class BoxAction extends Action {
     protected NumberBox box;
-    protected boolean isDone;
 
     public BoxAction(NumberBox box) {
+        super();
+
         this.box = box;
-        this.isDone = false;
     }
 
-    public void actWithDelta(float delta) {}
-    public void act() {
-        actWithDelta(Constants.DEFAULT_DELTA);
+    public BoxAction(NumberBox box, Interpolator interpolator) {
+        this(box);
+
+        if (interpolator != null)
+            this.interpolator = interpolator;
+
     }
 
-    public boolean isDone() {
-        return isDone;
-    }
-
-    public void setDone(boolean done) {
-        this.isDone = done;
-    }
-
-    public void makeDone() {
-        this.isDone = true;
-    }
 }

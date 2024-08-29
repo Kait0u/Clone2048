@@ -1,32 +1,30 @@
-package pl.kaitou_dev.clone2048.game_entities.number_box.actions;
-
-import pl.kaitou_dev.clone2048.game_entities.number_box.NumberBox;
+package pl.kaitou_dev.clone2048.utils.timed_actions;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-public class SequentialBoxAction extends BoxAction {
-    private Queue<BoxAction> actions;
-    private BoxAction currentAction = null;
+public class SequentialAction extends Action {
+    private final Queue<Action> actions;
+    private Action currentAction = null;
 
-    public SequentialBoxAction(NumberBox box) {
-        super(box);
+    public SequentialAction() {
+        super();
 
         actions = new ArrayDeque<>();
     }
 
-    public SequentialBoxAction(NumberBox box, BoxAction... actions) {
-        this(box);
+    public SequentialAction(Action... actions) {
+        this();
 
         addActions(actions);
     }
 
-    public void addAction(BoxAction action) {
+    public void addAction(Action action) {
         actions.add(action);
     }
 
-    public void addActions(BoxAction... actions) {
-        for (BoxAction action : actions) {
+    public void addActions(Action... actions) {
+        for (Action action : actions) {
             addAction(action);
         }
     }

@@ -13,6 +13,7 @@ import pl.kaitou_dev.clone2048.game_entities.number_box.actions.BoxMoveAction;
 import pl.kaitou_dev.clone2048.utils.FontUtils;
 import pl.kaitou_dev.clone2048.utils.MathNumUtils;
 import pl.kaitou_dev.clone2048.utils.PixmapUtils;
+import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
 
 public class NumberBox {
     private int value;
@@ -99,6 +100,10 @@ public class NumberBox {
 
     public void moveLinear(int x, int y, float durationSeconds) {
         action = new BoxMoveAction(this, x, y, durationSeconds);
+    }
+
+    public void move(int x, int y, float durationSeconds, Interpolator interpolator) {
+        action = new BoxMoveAction(this, x, y, durationSeconds, interpolator);
     }
 
     public int getPosX() {
