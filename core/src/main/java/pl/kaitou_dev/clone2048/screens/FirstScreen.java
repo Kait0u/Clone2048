@@ -45,7 +45,6 @@ public class FirstScreen implements Screen {
     @Override
     public void show() {
         // Prepare your screen here.
-        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     @Override
@@ -75,7 +74,7 @@ public class FirstScreen implements Screen {
     }
 
     private void handleInput() {
-        if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             game.setScreen(new GameScreen(game));
             dispose();
         }

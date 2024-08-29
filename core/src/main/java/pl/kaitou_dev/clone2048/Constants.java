@@ -7,4 +7,18 @@ public class Constants {
     public static final int SLOT_SIZE = 100;
     public static final float BASIC_MOVEMENT_SPEED = 0.075f;
     public static final int MAX_VALUE = 2048;
+
+    public enum GameResult {
+        VICTORY("Victory"), GAME_OVER("Game Over");
+
+        private final String resultHeading;
+
+        private GameResult(String resultHeading) {
+            this.resultHeading = resultHeading;
+        }
+
+        public String getResultHeading() {
+            return resultHeading;
+        }
+    }
 }

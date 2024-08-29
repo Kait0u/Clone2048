@@ -1,6 +1,8 @@
 package pl.kaitou_dev.clone2048.screens;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -8,11 +10,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.utils.FontUtils;
 
-public class GameOverScreen implements Screen {
+public class ResultsScreen implements Screen {
     private Game game;
     private OrthographicCamera camera;
     private FitViewport viewport;
@@ -21,7 +24,10 @@ public class GameOverScreen implements Screen {
     private BitmapFont fontHeading, fontText;
     private GlyphLayout layout;
 
-    public GameOverScreen(Game game) {
+    private Constants.GameResult result;
+    private String headingText;
+
+    public ResultsScreen(Game game, Constants.GameResult gameResult) {
         this.game = game;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
@@ -29,6 +35,9 @@ public class GameOverScreen implements Screen {
 
         batch = new SpriteBatch();
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        result = gameResult;
+        headingText = result.getResultHeading();
 
         layout = new GlyphLayout();
         fontHeading = FontUtils.monofett(120);
@@ -44,12 +53,17 @@ public class GameOverScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        ScreenUtils.clear(new Color(0xFFCCBFFF));
+
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        drawCenteredText("GAME OVER", fontHeading, Constants.GAME_WIDTH / 2, 100);
+        drawCenteredText(headingText, fontHeading, Constants.GAME_WIDTH / 2, Constants.GAME_HEIGHT - 100);
+        drawCenteredText("Press ENTER to return to the Main Menu", fontText, Constants.GAME_WIDTH / 2, 100);
 
         batch.end();
+
+        handleInput();
     }
 
     private void drawCenteredText(String text, BitmapFont font, int posX, int posY) {
@@ -63,9 +77,17 @@ public class GameOverScreen implements Screen {
         font.draw(batch, text, x, y);
     }
 
+    private void handleInput() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            game.setScreen(new FirstScreen(game));
+            dispose();
+        }
+    }
+
     @Override
     public void resize(int width, int height) {
-
+        viewport.update(width, height, true);
+        camera.update();
     }
 
     @Override
@@ -85,6 +107,8 @@ public class GameOverScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        fontHeading.dispose();
+        fontText.dispose();
+        batch.dispose();
     }
 }

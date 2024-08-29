@@ -63,15 +63,15 @@ public class GameScreen implements Screen {
         gameGrid.update(delta);
 
         if (gameGrid.isGameOver()) {
-            game.setScreen(new FirstScreen(game));
+            game.setScreen(new ResultsScreen(game, Constants.GameResult.GAME_OVER));
             dispose();
         }
     }
 
     private void handleInput() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            gameGrid.addNewBox();
-        }
+//        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+//            gameGrid.addNewBox();
+//        }
 
         gameGrid.handleInput();
     }
