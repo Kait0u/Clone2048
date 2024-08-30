@@ -64,11 +64,11 @@ public class GameScreen implements Screen {
 
         switch (gameGrid.getState()) {
             case GAME_OVER -> {
-                game.setScreen(new ResultsScreen(game, Constants.GameResult.GAME_OVER));
+                game.setScreen(new ResultsScreen(game, gameGrid, Constants.GameResult.GAME_OVER));
                 dispose();
             }
             case VICTORY -> {
-                game.setScreen(new ResultsScreen(game, Constants.GameResult.VICTORY));
+                game.setScreen(new ResultsScreen(game, gameGrid, Constants.GameResult.VICTORY));
                 dispose();
             }
         }
@@ -105,7 +105,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        gameGrid.dispose();
+//        gameGrid.dispose();
         spriteBatch.dispose();
     }
 }
