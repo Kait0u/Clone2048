@@ -35,8 +35,8 @@ public class GameGrid implements Disposable {
     private int secretNumber;
     private Map<Directions, Boolean> movementPossibilities;
 
-    private enum State {
-            IDLE, BUSY, GAME_OVER;
+    public enum State {
+            IDLE, BUSY, GAME_OVER, VICTORY;
     }
 
     private State state = State.IDLE;
@@ -97,6 +97,15 @@ public class GameGrid implements Disposable {
         }
 
         // Check if game should end
+        handleVictoryLoss();
+    }
+
+    private void handleVictoryLoss() {
+        if (state == State.IDLE) {
+            boolean got2048 = isValueOnBoard(2048);
+            if (got2048) state = State.VICTORY;
+        }
+
         if (state == State.IDLE) {
             boolean anyMovementPossible = movementPossibilities.values().stream().anyMatch(Boolean::booleanValue);
             if (!anyMovementPossible) state = State.GAME_OVER;
@@ -352,12 +361,18 @@ public class GameGrid implements Disposable {
     }
 
     public boolean addNewBox() {
+        int value = MathNumUtils.diceTest(10, secretNumber) ? 4 : 2;
+        return addNewBox(value);
+
+    }
+
+    public boolean addNewBox(int value) {
         Vector2 indices = randomEmptyIndices();
 
         if (indices != null) {
             int r = (int) indices.x;
             int c = (int) indices.y;
-            int value = MathNumUtils.diceTest(10, secretNumber) ? 4 : 2;
+
 
             NumberBox newBox = new NumberBox(this, value);
             grid[r][c] = newBox;
@@ -478,7 +493,21 @@ public class GameGrid implements Disposable {
         return palette;
     }
 
+    public boolean isValueOnBoard(int value) {
+        if (!MathNumUtils.isPowerOfTwo(value)) return false;
+
+        return Stream.of(grid).flatMap(Stream::of).filter(Objects::nonNull).anyMatch(box -> box.getValue() == value);
+    }
+
     public boolean isGameOver() {
         return state == State.GAME_OVER;
+    }
+
+    public boolean isVictory() {
+        return state == State.VICTORY;
+    }
+
+    public State getState() {
+        return state;
     }
 }

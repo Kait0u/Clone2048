@@ -46,7 +46,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(new Color(0xFFFFFFFF));
+        ScreenUtils.clear(Color.WHITE);
 
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
@@ -62,16 +62,22 @@ public class GameScreen implements Screen {
     private void update(float delta) {
         gameGrid.update(delta);
 
-        if (gameGrid.isGameOver()) {
-            game.setScreen(new ResultsScreen(game, Constants.GameResult.GAME_OVER));
-            dispose();
+        switch (gameGrid.getState()) {
+            case GAME_OVER -> {
+                game.setScreen(new ResultsScreen(game, Constants.GameResult.GAME_OVER));
+                dispose();
+            }
+            case VICTORY -> {
+                game.setScreen(new ResultsScreen(game, Constants.GameResult.VICTORY));
+                dispose();
+            }
         }
     }
 
     private void handleInput() {
-//        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-//            gameGrid.addNewBox();
-//        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            gameGrid.addNewBox(1024);
+        }
 
         gameGrid.handleInput();
     }

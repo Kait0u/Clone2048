@@ -33,7 +33,7 @@ public class NumberBox {
     private GlyphLayout layout;
 
 
-    double scale = 1.0;
+    private double scale = 1.0;
 
 
     public NumberBox(GameGrid grid, int value) throws IllegalArgumentException {
@@ -104,6 +104,10 @@ public class NumberBox {
 
     public void move(int x, int y, float durationSeconds, Interpolator interpolator) {
         action = new BoxMoveAction(this, x, y, durationSeconds, interpolator);
+    }
+
+    public int getValue() {
+        return value;
     }
 
     public int getPosX() {
