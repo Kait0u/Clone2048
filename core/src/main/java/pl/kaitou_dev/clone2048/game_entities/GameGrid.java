@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
@@ -14,8 +13,7 @@ import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.number_box.BoxColorPalette;
 import pl.kaitou_dev.clone2048.game_entities.number_box.NumberBox;
 import pl.kaitou_dev.clone2048.utils.MathNumUtils;
-import pl.kaitou_dev.clone2048.utils.PixmapUtils;
-import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
+import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
 import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolators;
 
 import java.util.*;
@@ -30,13 +28,13 @@ public class GameGrid implements Disposable {
 
     public static final int SIZE = 2 * GRID_PADDING + 4 * Constants.SLOT_SIZE + 3 * SLOT_SPACING;
 
-    private NumberBox[][] grid;
-    private ArrayList<NumberBox> boxesToRemove;
-    private int secretNumber;
-    private Map<Directions, Boolean> movementPossibilities;
+    private final NumberBox[][] grid;
+    private final ArrayList<NumberBox> boxesToRemove;
+    private final int secretNumber;
+    private final Map<Directions, Boolean> movementPossibilities;
 
     public enum State {
-            IDLE, BUSY, GAME_OVER, VICTORY;
+            IDLE, BUSY, GAME_OVER, VICTORY
     }
 
     private State state = State.IDLE;
@@ -56,11 +54,11 @@ public class GameGrid implements Disposable {
         movementPossibilities = Collections.synchronizedMap(new HashMap<>());
         updateLegalMoves();
 
-        Pixmap pmGridBackground = PixmapUtils.getRoundRectPixmap(SIZE, SIZE, SIZE * 5 / 100, Color.DARK_GRAY);
+        Pixmap pmGridBackground = GraphicsUtils.getRoundRectPixmap(SIZE, SIZE, SIZE * 5 / 100, Color.DARK_GRAY);
         txGridBackground = new Texture(pmGridBackground);
         pmGridBackground.dispose();
 
-        Pixmap pmGridSlot = PixmapUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, Color.LIGHT_GRAY);
+        Pixmap pmGridSlot = GraphicsUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, Color.LIGHT_GRAY);
         txGridSlot = new Texture(pmGridSlot);
         pmGridSlot.dispose();
 
@@ -80,9 +78,9 @@ public class GameGrid implements Disposable {
         }
 
         // For boxes to remove
-        Iterator itBoxesToRemove = boxesToRemove.iterator();
+        Iterator<NumberBox> itBoxesToRemove = boxesToRemove.iterator();
         while (itBoxesToRemove.hasNext()) {
-            NumberBox box = (NumberBox) itBoxesToRemove.next();
+            NumberBox box = itBoxesToRemove.next();
 
             if (box.isBusy()) {
                 box.update(delta);
@@ -336,7 +334,6 @@ public class GameGrid implements Disposable {
             case UP -> (row + 1 < GRID_SIDE) ? grid[row + 1][col] : null;
             case LEFT -> (col - 1 >= 0) ? grid[row][col - 1] : null;
             case RIGHT -> (col + 1 < GRID_SIDE) ? grid[row][col + 1] : null;
-            default -> null;
         };
     }
 

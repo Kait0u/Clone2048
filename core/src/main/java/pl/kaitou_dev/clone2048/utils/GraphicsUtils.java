@@ -2,8 +2,13 @@ package pl.kaitou_dev.clone2048.utils;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class PixmapUtils {
+public class GraphicsUtils {
+    private static final GlyphLayout GLYPH_LAYOUT = new GlyphLayout();
+
     public static Pixmap getRoundRectPixmap(int width, int height, int radius, Color color) {
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
         pixmap.setColor(color);
@@ -25,5 +30,16 @@ public class PixmapUtils {
         pixmap.fillRectangle(xLeft + radius, yBot, width - 2 * radius, height);
 
         return pixmap;
+    }
+
+    public static void drawCenteredTextLine(SpriteBatch batch, String text, BitmapFont font, int posX, int posY) {
+        GLYPH_LAYOUT.setText(font, text);
+        int textWidth = (int) GLYPH_LAYOUT.width;
+        int textHeight = (int) GLYPH_LAYOUT.height;
+
+        int x = posX - textWidth / 2;
+        int y = posY - textHeight / 2;
+
+        font.draw(batch, text, x, y);
     }
 }

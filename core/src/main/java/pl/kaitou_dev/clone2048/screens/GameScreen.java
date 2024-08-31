@@ -9,16 +9,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import pl.kaitou_dev.clone2048.Constants;
-import pl.kaitou_dev.clone2048.game_entities.Directions;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
 
 public class GameScreen implements Screen {
-    private Game game;
+    private final Game game;
 
-    private OrthographicCamera camera;
-    private FitViewport viewport;
+    private final OrthographicCamera camera;
+    private final FitViewport viewport;
 
-    private SpriteBatch spriteBatch;
+    private final SpriteBatch spriteBatch;
 
 
     // Game objects
@@ -105,7 +104,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-//        gameGrid.dispose();
         spriteBatch.dispose();
     }
 }

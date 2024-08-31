@@ -12,7 +12,7 @@ import pl.kaitou_dev.clone2048.game_entities.number_box.actions.BoxAction;
 import pl.kaitou_dev.clone2048.game_entities.number_box.actions.BoxMoveAction;
 import pl.kaitou_dev.clone2048.utils.FontUtils;
 import pl.kaitou_dev.clone2048.utils.MathNumUtils;
-import pl.kaitou_dev.clone2048.utils.PixmapUtils;
+import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
 import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
 
 public class NumberBox {
@@ -45,7 +45,7 @@ public class NumberBox {
         colorPalette = this.grid.getPalette();
         updateColors(false);
 
-        texture = new Texture(PixmapUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, bgColor));
+        texture = new Texture(GraphicsUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, bgColor));
 
         font = FontUtils.losevka(40);
         updateFontColor();
@@ -153,7 +153,7 @@ public class NumberBox {
 
     private void updateTexture() {
         if (texture != null) texture.dispose();
-        texture = new Texture(PixmapUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, bgColor));
+        texture = new Texture(GraphicsUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, bgColor));
     }
 
     private void updateFontColor() {

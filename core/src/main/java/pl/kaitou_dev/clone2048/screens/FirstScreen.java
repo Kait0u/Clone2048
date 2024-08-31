@@ -8,22 +8,22 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.utils.FontUtils;
+import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
 
 /** First screen of the application. Displayed after the application is created. */
 public class FirstScreen implements Screen {
-    private Game game;
-    private OrthographicCamera camera;
-    private FitViewport viewport;
-    private SpriteBatch batch;
+    private final Game game;
+    private final OrthographicCamera camera;
+    private final FitViewport viewport;
+    private final SpriteBatch batch;
 
-    private BitmapFont fontLogo, fontText;
-    private GlyphLayout layout;
+    private final BitmapFont fontLogo;
+    private final BitmapFont fontText;
 
     public FirstScreen(Game game) {
         this.game = game;
@@ -35,7 +35,6 @@ public class FirstScreen implements Screen {
         batch = new SpriteBatch();
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        layout = new GlyphLayout();
         fontLogo = FontUtils.monofett(120);
         fontLogo.setColor(Color.BLACK);
         fontText = FontUtils.losevka(30);
@@ -54,23 +53,13 @@ public class FirstScreen implements Screen {
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        drawCenteredText("2048", fontLogo, Constants.GAME_WIDTH / 2, Constants.GAME_HEIGHT);
 
-        drawCenteredText("Press ENTER to begin", fontText, Constants.GAME_WIDTH / 2, 200);
+        GraphicsUtils.drawCenteredTextLine(batch, "2048", fontLogo, Constants.GAME_WIDTH / 2, Constants.GAME_HEIGHT);
+        GraphicsUtils.drawCenteredTextLine(batch, "Press ENTER to begin", fontText, Constants.GAME_WIDTH / 2, 200);
+
         batch.end();
 
         handleInput();
-    }
-
-    private void drawCenteredText(String text, BitmapFont font, int posX, int posY) {
-        layout.setText(font, text);
-        int textWidth = (int) layout.width;
-        int textHeight = (int) layout.height;
-
-        int x = posX - textWidth / 2;
-        int y = posY - textHeight / 2;
-
-        font.draw(batch, text, x, y);
     }
 
     private void handleInput() {

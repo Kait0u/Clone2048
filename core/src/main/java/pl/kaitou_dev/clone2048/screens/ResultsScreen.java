@@ -4,35 +4,28 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
 import pl.kaitou_dev.clone2048.utils.FontUtils;
+import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
 
 public class ResultsScreen implements Screen {
-    private Game game;
-    private OrthographicCamera camera;
-    private FitViewport viewport;
-    private SpriteBatch batch;
-    private FrameBuffer frameBuffer;
+    private final Game game;
+    private final OrthographicCamera camera;
+    private final FitViewport viewport;
+    private final SpriteBatch batch;
 
-    private BitmapFont fontHeading, fontText;
-    private GlyphLayout layout;
+    private final BitmapFont fontHeading;
+    private final BitmapFont fontText;
 
-    private Constants.GameResult result;
-    private String headingText;
+    private final String headingText;
 
-    private GameGrid resultGrid;
+    private final Sprite gridSprite;
 
     public ResultsScreen(Game game, GameGrid grid, Constants.GameResult gameResult) {
         this.game = game;
@@ -43,19 +36,15 @@ public class ResultsScreen implements Screen {
         batch = new SpriteBatch();
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, true);
+        headingText = gameResult.getResultHeading();
 
-        result = gameResult;
-        headingText = result.getResultHeading();
-
-        layout = new GlyphLayout();
         fontHeading = FontUtils.monofett(120);
         fontHeading.setColor(Color.BLACK);
         fontText = FontUtils.losevka(30);
         fontText.setColor(Color.BLACK);
 
-
-        resultGrid = grid;
+        gridSprite = getGridSprite(grid);
+        grid.dispose();
     }
 
     @Override
@@ -68,48 +57,23 @@ public class ResultsScreen implements Screen {
         ScreenUtils.clear(new Color(0xFFCCBFFF));
 
         viewport.apply();
-
-        frameBuffer.begin();
-        Gdx.gl.glClearColor(1, 1, 1, 0);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        resultGrid.drawGrid(batch);
-        resultGrid.drawBoxes(batch);
+        GraphicsUtils.drawCenteredTextLine(
+            batch, headingText, fontHeading, Constants.GAME_WIDTH / 2, Constants.GAME_HEIGHT
+        );
+        GraphicsUtils.drawCenteredTextLine(
+            batch, "Press ENTER to return to the Main Menu", fontText, Constants.GAME_WIDTH / 2, 100
+        );
 
-        batch.end();
-        frameBuffer.end();
+        int w = gridSprite.getRegionWidth() / 2;
+        int h = gridSprite.getRegionHeight() / 2;
 
-        viewport.apply();
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-
-        drawCenteredText(headingText, fontHeading, Constants.GAME_WIDTH / 2, Constants.GAME_HEIGHT);
-        drawCenteredText("Press ENTER to return to the Main Menu", fontText, Constants.GAME_WIDTH / 2, 100);
-
-        TextureRegion frameBufferRegion = new TextureRegion(frameBuffer.getColorBufferTexture());
-        frameBufferRegion.flip(false, true);
-
-        int w = frameBufferRegion.getRegionWidth() / 2;
-        int h = frameBufferRegion.getRegionHeight() / 2;
-
-        batch.draw(frameBufferRegion, Constants.GAME_WIDTH / 2 - w / 2, Constants.GAME_HEIGHT / 2 - h / 2, w, h);
-
+        batch.draw(gridSprite, Constants.GAME_WIDTH / 2 - w / 2, Constants.GAME_HEIGHT / 2 - h / 2, w, h);
         batch.end();
 
         handleInput();
-    }
-
-    private void drawCenteredText(String text, BitmapFont font, int posX, int posY) {
-        layout.setText(font, text);
-        int textWidth = (int) layout.width;
-        int textHeight = (int) layout.height;
-
-        int x = posX - textWidth / 2;
-        int y = posY - textHeight / 2;
-
-        font.draw(batch, text, x, y);
     }
 
     private void handleInput() {
@@ -117,6 +81,34 @@ public class ResultsScreen implements Screen {
             game.setScreen(new FirstScreen(game));
             dispose();
         }
+    }
+
+    private Sprite getGridSprite(GameGrid grid) {
+        FrameBuffer frameBuffer = new FrameBuffer(
+            Pixmap.Format.RGBA8888, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, true
+        );
+
+        frameBuffer.begin();
+        Gdx.gl.glClearColor(1, 1, 1, 0);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+
+        grid.drawGrid(batch);
+        grid.drawBoxes(batch);
+
+        batch.end();
+        Pixmap pixmap = Pixmap.createFromFrameBuffer(0, 0, frameBuffer.getWidth(), frameBuffer.getHeight());
+        frameBuffer.end();
+        frameBuffer.dispose();
+
+        Texture tex = new Texture(pixmap);
+        pixmap.dispose();
+
+        Sprite sprite = new Sprite(tex);
+        sprite.flip(false, true);
+
+        return sprite;
     }
 
     @Override
@@ -144,8 +136,7 @@ public class ResultsScreen implements Screen {
     public void dispose() {
         fontHeading.dispose();
         fontText.dispose();
-        resultGrid.dispose();
-        frameBuffer.dispose();
+        gridSprite.getTexture().dispose();
         batch.dispose();
     }
 }
