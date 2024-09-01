@@ -23,6 +23,10 @@ public class Action {
         actWithDelta(Constants.DEFAULT_DELTA);
     }
 
+    public void reset() {
+        isDone = false;
+    }
+
     public boolean isDone() {
         return isDone;
     }

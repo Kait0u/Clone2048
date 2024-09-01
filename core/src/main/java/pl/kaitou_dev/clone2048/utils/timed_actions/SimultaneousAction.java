@@ -31,8 +31,16 @@ public class SimultaneousAction extends Action {
     @Override
     public void actWithDelta(float delta) {
         actions.forEach(action -> {
-            if (!action.isDone())
-                action.actWithDelta(delta);
+            action.actWithDelta(delta);
         });
+
+        if (actions.stream().allMatch(Action::isDone)) makeDone();
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+
+        actions.stream().parallel().forEach(Action::reset);
     }
 }

@@ -38,4 +38,9 @@ public class BoxMoveAction extends BoxAction {
         int y = (int) interpolator.interpolate(startY, destY, elapsedSeconds, durationSeconds);
         box.setCoords(x, y);
     }
+
+    @Override
+    public void reset() {
+        elapsedSeconds = 0;
+    }
 }
