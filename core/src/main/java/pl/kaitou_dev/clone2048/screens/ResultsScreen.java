@@ -13,12 +13,15 @@ import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
 import pl.kaitou_dev.clone2048.utils.FontUtils;
 import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
+import pl.kaitou_dev.clone2048.utils.timed_actions.Blinker;
 
 public class ResultsScreen implements Screen {
     private final Game game;
     private final OrthographicCamera camera;
     private final FitViewport viewport;
     private final SpriteBatch batch;
+
+    private final Blinker blinker;
 
     private final BitmapFont fontHeading;
     private final BitmapFont fontText;
@@ -45,15 +48,22 @@ public class ResultsScreen implements Screen {
 
         gridSprite = getGridSprite(grid);
         grid.dispose();
+
+        blinker = new Blinker(Constants.DEFAULT_BLINK, Constants.DEFAULT_BLINK, true);
     }
 
     @Override
     public void show() {
+        blinker.start();
+    }
 
+    public void update(float delta) {
+        blinker.actWithDelta(delta);
     }
 
     @Override
     public void render(float delta) {
+        update(delta);
         ScreenUtils.clear(new Color(0xFFCCBFFF));
 
         viewport.apply();
@@ -63,9 +73,12 @@ public class ResultsScreen implements Screen {
         GraphicsUtils.drawCenteredTextLine(
             batch, headingText, fontHeading, Constants.GAME_WIDTH / 2, Constants.GAME_HEIGHT
         );
-        GraphicsUtils.drawCenteredTextLine(
-            batch, "Press ENTER to return to the Main Menu", fontText, Constants.GAME_WIDTH / 2, 100
+
+        if (blinker.isOn())
+            GraphicsUtils.drawCenteredTextLine(
+                batch, "Press ENTER to return to the Main Menu", fontText, Constants.GAME_WIDTH / 2, 100
         );
+
 
         int w = gridSprite.getRegionWidth() / 2;
         int h = gridSprite.getRegionHeight() / 2;

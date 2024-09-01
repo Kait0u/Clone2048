@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.utils.FontUtils;
 import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
+import pl.kaitou_dev.clone2048.utils.timed_actions.Blinker;
 
 /** First screen of the application. Displayed after the application is created. */
 public class FirstScreen implements Screen {
@@ -24,6 +25,8 @@ public class FirstScreen implements Screen {
 
     private final BitmapFont fontLogo;
     private final BitmapFont fontText;
+
+    private final Blinker blinker;
 
     public FirstScreen(Game game) {
         this.game = game;
@@ -39,15 +42,23 @@ public class FirstScreen implements Screen {
         fontLogo.setColor(Color.BLACK);
         fontText = FontUtils.losevka(30);
         fontText.setColor(Color.BLACK);
+
+        blinker = new Blinker(Constants.DEFAULT_BLINK, Constants.DEFAULT_BLINK, true);
     }
 
     @Override
     public void show() {
         // Prepare your screen here.
+        blinker.start();
+    }
+
+    public void update(float delta) {
+        blinker.actWithDelta(delta);
     }
 
     @Override
     public void render(float delta) {
+        update(delta);
         // Draw your screen here. "delta" is the time since last render in seconds.
         ScreenUtils.clear(new Color(0xFFCCBFFF));
 
@@ -55,7 +66,10 @@ public class FirstScreen implements Screen {
         batch.begin();
 
         GraphicsUtils.drawCenteredTextLine(batch, "2048", fontLogo, Constants.GAME_WIDTH / 2, Constants.GAME_HEIGHT);
-        GraphicsUtils.drawCenteredTextLine(batch, "Press ENTER to begin", fontText, Constants.GAME_WIDTH / 2, 200);
+        if (blinker.isOn())
+            GraphicsUtils.drawCenteredTextLine(
+                batch, "Press ENTER to begin", fontText, Constants.GAME_WIDTH / 2, 200
+        );
 
         batch.end();
 
