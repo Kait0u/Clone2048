@@ -15,10 +15,12 @@ import pl.kaitou_dev.clone2048.game_entities.number_box.BoxColorPalette;
 import pl.kaitou_dev.clone2048.game_entities.number_box.NumberBox;
 import pl.kaitou_dev.clone2048.utils.MathNumUtils;
 import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
+import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
 import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolators;
 
 import java.util.*;
 import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -28,6 +30,7 @@ public class GameGrid implements Disposable {
     private static final int SLOT_SPACING = 10;
 
     public static final int SIZE = 2 * GRID_PADDING + 4 * Constants.SLOT_SIZE + 3 * SLOT_SPACING;
+    public static final Interpolator DEFAULT_INTERPOLATOR = Interpolators.QUADRATIC;
 
     private final NumberBox[][] grid;
     private final ArrayList<NumberBox> boxesToRemove;
@@ -186,7 +189,7 @@ public class GameGrid implements Disposable {
                     }
                 }
                 Vector2 coords = getSlotCoords(newR, c);
-                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, Interpolators.QUADRATIC);
+                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
             }
         }
     }
@@ -219,7 +222,7 @@ public class GameGrid implements Disposable {
                     }
                 }
                 Vector2 coords = getSlotCoords(newR, c);
-                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, Interpolators.QUADRATIC);
+                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
             }
         }
     }
