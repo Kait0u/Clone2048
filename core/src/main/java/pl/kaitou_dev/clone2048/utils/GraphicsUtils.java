@@ -38,7 +38,7 @@ public class GraphicsUtils {
         int textHeight = (int) GLYPH_LAYOUT.height;
 
         int x = posX - textWidth / 2;
-        int y = posY - textHeight / 2;
+        int y = posY + textHeight / 2;
 
         font.draw(batch, text, x, y);
     }

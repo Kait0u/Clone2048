@@ -65,11 +65,12 @@ public class FirstScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        GraphicsUtils.drawCenteredTextLine(batch, "2048", fontLogo, Constants.GAME_WIDTH / 2, Constants.GAME_HEIGHT);
+        GraphicsUtils.drawCenteredTextLine(
+            batch, "2048", fontLogo, Constants.GAME_WIDTH / 2, (int) (Constants.GAME_HEIGHT - fontLogo.getCapHeight()));
         if (blinker.isOn())
             GraphicsUtils.drawCenteredTextLine(
-                batch, "Press ENTER to begin", fontText, Constants.GAME_WIDTH / 2, 200
-        );
+                batch, "Press ENTER to begin", fontText, Constants.GAME_WIDTH / 2, 50 + (int) fontText.getCapHeight()
+            );
 
         batch.end();
 

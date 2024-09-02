@@ -71,7 +71,7 @@ public class ResultsScreen implements Screen {
         batch.begin();
 
         GraphicsUtils.drawCenteredTextLine(
-            batch, headingText, fontHeading, Constants.GAME_WIDTH / 2, Constants.GAME_HEIGHT
+            batch, headingText, fontHeading, Constants.GAME_WIDTH / 2, (int) (Constants.GAME_HEIGHT - fontHeading.getCapHeight())
         );
 
         if (blinker.isOn())

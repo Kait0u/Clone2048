@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
@@ -38,6 +39,7 @@ public class GameGrid implements Disposable {
     }
 
     private State state = State.IDLE;
+    private boolean shouldShowNumbers = true;
 
 
     // Textures & Graphics
@@ -63,6 +65,11 @@ public class GameGrid implements Disposable {
         pmGridSlot.dispose();
 
         addNewBox();
+    }
+
+    public GameGrid(boolean showNumbers) {
+        this();
+        shouldShowNumbers = showNumbers;
     }
 
     public void update(float delta) {
@@ -418,7 +425,7 @@ public class GameGrid implements Disposable {
         }
     }
 
-    public void drawBoxes(Batch batch) {
+    public void drawBoxes(SpriteBatch batch) {
         for (NumberBox box: boxesToRemove) {
             box.draw(batch);
         }
@@ -506,5 +513,9 @@ public class GameGrid implements Disposable {
 
     public State getState() {
         return state;
+    }
+
+    public boolean isShouldShowNumbers() {
+        return shouldShowNumbers;
     }
 }

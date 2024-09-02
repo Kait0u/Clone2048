@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
@@ -23,15 +24,12 @@ public class NumberBox {
     private int posX, posY;
     private BoxAction action;
 
-    private BitmapFont font;
-
     private Texture texture;
     private BoxColorPalette colorPalette;
     private Color bgColor = Color.SKY;
     private Color fontColor = Color.BLACK;
 
-    private GlyphLayout layout;
-
+    private BitmapFont font;
 
     private double scale = 1.0;
 
@@ -49,25 +47,19 @@ public class NumberBox {
 
         font = FontUtils.losevka(40);
         updateFontColor();
-
-        layout = new GlyphLayout();
     }
 
 
-    public void draw(Batch batch) {
+    public void draw(SpriteBatch batch) {
         batch.draw(texture, posX, posY, (float) (texture.getWidth() * scale), (float) (texture.getHeight() * scale));
-        drawText(batch);
+        if (grid.isShouldShowNumbers())
+            drawText(batch);
     }
 
-    private void drawText(Batch batch) {
-        layout.setText(font, String.valueOf(value));
-        int textWidth = (int) layout.width;
-        int textHeight = (int) layout.height;
-
-        int x = posX + Constants.SLOT_SIZE / 2 - textWidth / 2;
-        int y = posY + Constants.SLOT_SIZE / 2 + textHeight / 2;
-
-        font.draw(batch, String.valueOf(value), x, y);
+    private void drawText(SpriteBatch batch) {
+        int x = posX + Constants.SLOT_SIZE / 2;
+        int y = posY + Constants.SLOT_SIZE / 2;
+        GraphicsUtils.drawCenteredTextLine(batch, String.valueOf(value), font, x, y);
     }
 
     public void upgrade() {
