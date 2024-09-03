@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
@@ -20,8 +19,6 @@ import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolators;
 
 import java.util.*;
 import java.util.function.IntPredicate;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -39,7 +36,7 @@ public class GameGrid implements Disposable {
     private final Map<Directions, Boolean> movementPossibilities;
 
     public enum State {
-            IDLE, BUSY, GAME_OVER, VICTORY
+        IDLE, BUSY, GAME_OVER, VICTORY
     }
 
     private State state = State.IDLE;
@@ -161,72 +158,8 @@ public class GameGrid implements Disposable {
         }
     }
 
-//    private void moveUp() {
-//        for (int r = 1; r < GRID_SIDE; ++r) {
-//            for (int c = 0; c < GRID_SIDE; ++c) {
-//                NumberBox consideredBox = grid[r][c];
-//                if (consideredBox == null) continue;
-//
-//                grid[r][c] = null;
-//                int newR = r;
-//
-//                for (int distance = 1; r - distance >= 0; ++distance) {
-//                    newR = r - distance;
-//                    NumberBox otherBox = grid[newR][c];
-//                    if (otherBox != null) {
-//                        // Collision
-//                        if (otherBox.equals(consideredBox)) {
-//                            otherBox.upgrade();
-//                            boxesToRemove.add(consideredBox);
-//                        } else {
-//                            grid[++newR][c] = consideredBox;
-//                        }
-//                        break;
-//                    } else if (newR == 0) {
-//                        // Out of bounds
-//                        grid[newR][c] = consideredBox;
-//                    }
-//                }
-//                Vector2 coords = getSlotCoords(newR, c);
-//                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
-//            }
-//        }
-//    }
-//
-//    private void moveDown() {
-//        for (int r = GRID_SIDE - 2; 0 <= r; --r) {
-//            for (int c = 0; c < GRID_SIDE; ++c) {
-//                // Check the farthest possible movement
-//                NumberBox consideredBox = grid[r][c];
-//                if (consideredBox == null) continue;
-//
-//                grid[r][c] = null;
-//                int newR = r;
-//
-//                for (int distance = 1; r + distance < GRID_SIDE; ++distance) {
-//                    newR = r + distance;
-//                    NumberBox otherBox = grid[newR][c];
-//                    if (otherBox != null) {
-//                        // Collision
-//                        if (otherBox.equals(consideredBox)) {
-//                            otherBox.upgrade();
-//                            boxesToRemove.add(consideredBox);
-//                        } else {
-//                            grid[--newR][c] = consideredBox;
-//                        }
-//                        break;
-//                    } else if (newR == GRID_SIDE - 1) {
-//                        // Out of bounds
-//                        grid[newR][c] = consideredBox;
-//                    }
-//                }
-//                Vector2 coords = getSlotCoords(newR, c);
-//                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
-//            }
-//        }
-//    }
 
-    public void moveVertically(Directions direction) {
+    private void moveVertically(Directions direction) {
         final int distMultiplier = switch (direction) {
             case UP -> -1;
             case DOWN -> 1;
@@ -273,7 +206,7 @@ public class GameGrid implements Disposable {
 
     }
 
-    public void moveHorizontally(Directions direction) {
+    private void moveHorizontally(Directions direction) {
         final int distMultiplier = switch (direction) {
             case RIGHT -> 1;
             case LEFT -> -1;
@@ -325,72 +258,6 @@ public class GameGrid implements Disposable {
         return idx == 0 || idx == GRID_SIDE - 1;
     }
 
-//    private void moveRight() {
-//        for (int c = GRID_SIDE - 2; 0 <= c; --c) {
-//            for (int r = 0; r < GRID_SIDE; ++r) {
-//                // Check the farthest possible movement
-//                NumberBox consideredBox = grid[r][c];
-//                if (consideredBox == null) continue;
-//
-//                grid[r][c] = null;
-//                int newC = c;
-//
-//                for (int distance = 1; c + distance < GRID_SIDE; ++distance) {
-//                    newC = c + distance;
-//                    NumberBox otherBox = grid[r][newC];
-//                    if (otherBox != null) {
-//                        // Collision
-//                        if (otherBox.equals(consideredBox)) {
-//                            otherBox.upgrade();
-//                            boxesToRemove.add(consideredBox);
-//                        } else {
-//                            grid[r][--newC] = consideredBox;
-//                        }
-//                        break;
-//                    } else if (newC == GRID_SIDE - 1) {
-//                        // Out of bounds
-//                        grid[r][newC] = consideredBox;
-//                    }
-//                }
-//                Vector2 coords = getSlotCoords(r, newC);
-//                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, Interpolators.QUADRATIC);
-//            }
-//        }
-//    }
-//
-//    private void moveLeft() {
-//        for (int c = 1; c < GRID_SIDE; ++c) {
-//            for (int r = 0; r < GRID_SIDE; ++r) {
-//                // Check the farthest possible movement
-//                NumberBox consideredBox = grid[r][c];
-//                if (consideredBox == null) continue;
-//
-//                grid[r][c] = null;
-//                int newC = c;
-//
-//                for (int distance = 1; c - distance >= 0; ++distance) {
-//                    newC = c - distance;
-//                    NumberBox otherBox = grid[r][newC];
-//                    if (otherBox != null) {
-//                        // Collision
-//                        if (otherBox.equals(consideredBox)) {
-//                            otherBox.upgrade();
-//                            boxesToRemove.add(consideredBox);
-//                        } else {
-//                            grid[r][++newC] = consideredBox;
-//                        }
-//                        break;
-//                    } else if (newC == 0) {
-//                        // Out of bounds
-//                        grid[r][newC] = consideredBox;
-//                    }
-//                }
-//                Vector2 coords = getSlotCoords(r, newC);
-//                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, Interpolators.QUADRATIC);
-//            }
-//        }
-//    }
-
     public boolean isMovementPossible(Directions direction) {
         IntPredicate boundaryPredicate = switch(direction) {
             case UP, LEFT -> (v -> v < GRID_SIDE - 1);
@@ -414,26 +281,6 @@ public class GameGrid implements Disposable {
         }
 
         return false;
-    }
-
-    public NumberBox[] getBound(Directions side) {
-        switch (side) {
-            case UP -> {
-                return grid[0];
-            }
-            case DOWN -> {
-                return grid[GRID_SIDE - 1];
-            }
-            case LEFT -> {
-                return IntStream.range(0, GRID_SIDE).mapToObj(idx -> grid[idx][0]).toArray(NumberBox[]::new);
-            }
-            case RIGHT -> {
-                return IntStream.range(0, GRID_SIDE).mapToObj(idx -> grid[idx][GRID_SIDE - 1]).toArray(NumberBox[]::new);
-            }
-        }
-
-        // Will never be reached
-        return null;
     }
 
     public NumberBox getNeighbor(int row, int col, Directions side) {
@@ -465,13 +312,12 @@ public class GameGrid implements Disposable {
         return null;
     }
 
-    public boolean addNewBox() {
+    public void addNewBox() {
         int value = MathNumUtils.diceTest(10, secretNumber) ? 4 : 2;
-        return addNewBox(value);
-
+        addNewBox(value);
     }
 
-    public boolean addNewBox(int value) {
+    public void addNewBox(int value) {
         Vector2 indices = randomEmptyIndices();
 
         if (indices != null) {
@@ -486,7 +332,6 @@ public class GameGrid implements Disposable {
             newBox.setCoords((int) boxCoords.x, (int) boxCoords.y);
         }
 
-        return indices != null;
     }
 
     private ArrayList<Vector2> getEmptyIndices() {
@@ -506,8 +351,7 @@ public class GameGrid implements Disposable {
         ArrayList<Vector2> emptyIndices = getEmptyIndices();
         if (emptyIndices.isEmpty()) return null;
 
-        Vector2 choice = emptyIndices.get(MathNumUtils.randInt(emptyIndices.size()));
-        return choice;
+        return emptyIndices.get(MathNumUtils.randInt(emptyIndices.size()));
     }
 
     public void drawGrid(SpriteBatch batch) {
