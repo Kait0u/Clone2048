@@ -21,6 +21,7 @@ import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolators;
 import java.util.*;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -155,90 +156,147 @@ public class GameGrid implements Disposable {
 
     public void move(Directions direction) {
         switch (direction) {
-            case DOWN ->  moveDown();
-            case UP -> moveUp();
-            case LEFT -> moveLeft();
-            case RIGHT -> moveRight();
+            case UP, DOWN -> moveVertically(direction);
+            case LEFT, RIGHT -> moveHorizontally(direction);
         }
     }
 
-    private void moveUp() {
-        for (int r = 1; r < GRID_SIDE; ++r) {
-            for (int c = 0; c < GRID_SIDE; ++c) {
+//    private void moveUp() {
+//        for (int r = 1; r < GRID_SIDE; ++r) {
+//            for (int c = 0; c < GRID_SIDE; ++c) {
+//                NumberBox consideredBox = grid[r][c];
+//                if (consideredBox == null) continue;
+//
+//                grid[r][c] = null;
+//                int newR = r;
+//
+//                for (int distance = 1; r - distance >= 0; ++distance) {
+//                    newR = r - distance;
+//                    NumberBox otherBox = grid[newR][c];
+//                    if (otherBox != null) {
+//                        // Collision
+//                        if (otherBox.equals(consideredBox)) {
+//                            otherBox.upgrade();
+//                            boxesToRemove.add(consideredBox);
+//                        } else {
+//                            grid[++newR][c] = consideredBox;
+//                        }
+//                        break;
+//                    } else if (newR == 0) {
+//                        // Out of bounds
+//                        grid[newR][c] = consideredBox;
+//                    }
+//                }
+//                Vector2 coords = getSlotCoords(newR, c);
+//                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
+//            }
+//        }
+//    }
+//
+//    private void moveDown() {
+//        for (int r = GRID_SIDE - 2; 0 <= r; --r) {
+//            for (int c = 0; c < GRID_SIDE; ++c) {
+//                // Check the farthest possible movement
+//                NumberBox consideredBox = grid[r][c];
+//                if (consideredBox == null) continue;
+//
+//                grid[r][c] = null;
+//                int newR = r;
+//
+//                for (int distance = 1; r + distance < GRID_SIDE; ++distance) {
+//                    newR = r + distance;
+//                    NumberBox otherBox = grid[newR][c];
+//                    if (otherBox != null) {
+//                        // Collision
+//                        if (otherBox.equals(consideredBox)) {
+//                            otherBox.upgrade();
+//                            boxesToRemove.add(consideredBox);
+//                        } else {
+//                            grid[--newR][c] = consideredBox;
+//                        }
+//                        break;
+//                    } else if (newR == GRID_SIDE - 1) {
+//                        // Out of bounds
+//                        grid[newR][c] = consideredBox;
+//                    }
+//                }
+//                Vector2 coords = getSlotCoords(newR, c);
+//                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
+//            }
+//        }
+//    }
+
+    public void moveVertically(Directions direction) {
+        final int distMultiplier = switch (direction) {
+            case UP -> -1;
+            case DOWN -> 1;
+            default -> throw new IllegalStateException("Unexpected value: " + direction);
+        };
+
+        IntStream rowIdxStream = (direction == Directions.DOWN
+            ? MathNumUtils.reverseIntStream(IntStream.range(0, GRID_SIDE))
+            : IntStream.range(0, GRID_SIDE));
+
+        rowIdxStream = rowIdxStream.skip(1);
+
+        rowIdxStream.forEach(r -> {
+            IntStream colIdxStream = IntStream.range(0, GRID_SIDE);
+            colIdxStream.forEach(c -> {
                 NumberBox consideredBox = grid[r][c];
-                if (consideredBox == null) continue;
+                if (consideredBox == null) return;
 
                 grid[r][c] = null;
                 int newR = r;
 
-                for (int distance = 1; r - distance >= 0; ++distance) {
-                    newR = r - distance;
+                for (int distance = 1; indexWithinBounds(r + distance * distMultiplier); ++distance) {
+                    newR = r + distance * distMultiplier;
                     NumberBox otherBox = grid[newR][c];
+
                     if (otherBox != null) {
-                        // Collision
                         if (otherBox.equals(consideredBox)) {
                             otherBox.upgrade();
                             boxesToRemove.add(consideredBox);
                         } else {
-                            grid[++newR][c] = consideredBox;
+                            newR -= distMultiplier;
+                            grid[newR][c] = consideredBox;
                         }
                         break;
-                    } else if (newR == 0) {
-                        // Out of bounds
+                    } else if (indexAtBound(newR)) {
                         grid[newR][c] = consideredBox;
                     }
                 }
+
                 Vector2 coords = getSlotCoords(newR, c);
                 consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
-            }
-        }
+            });
+        });
+
     }
 
-    private void moveDown() {
-        for (int r = GRID_SIDE - 2; 0 <= r; --r) {
-            for (int c = 0; c < GRID_SIDE; ++c) {
-                // Check the farthest possible movement
+    public void moveHorizontally(Directions direction) {
+        final int distMultiplier = switch (direction) {
+            case RIGHT -> 1;
+            case LEFT -> -1;
+            default -> throw new IllegalStateException("Unexpected value: " + direction);
+        };
+
+        IntStream colIdxStream = direction == Directions.RIGHT
+            ? MathNumUtils.reverseIntStream(IntStream.range(0, GRID_SIDE))
+            : IntStream.range(0, GRID_SIDE);
+
+        colIdxStream = colIdxStream.skip(1);
+
+        colIdxStream.forEach(c -> {
+            IntStream rowIdxStream = IntStream.range(0, GRID_SIDE);
+            rowIdxStream.forEach(r -> {
                 NumberBox consideredBox = grid[r][c];
-                if (consideredBox == null) continue;
-
-                grid[r][c] = null;
-                int newR = r;
-
-                for (int distance = 1; r + distance < GRID_SIDE; ++distance) {
-                    newR = r + distance;
-                    NumberBox otherBox = grid[newR][c];
-                    if (otherBox != null) {
-                        // Collision
-                        if (otherBox.equals(consideredBox)) {
-                            otherBox.upgrade();
-                            boxesToRemove.add(consideredBox);
-                        } else {
-                            grid[--newR][c] = consideredBox;
-                        }
-                        break;
-                    } else if (newR == GRID_SIDE - 1) {
-                        // Out of bounds
-                        grid[newR][c] = consideredBox;
-                    }
-                }
-                Vector2 coords = getSlotCoords(newR, c);
-                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
-            }
-        }
-    }
-
-    private void moveRight() {
-        for (int c = GRID_SIDE - 2; 0 <= c; --c) {
-            for (int r = 0; r < GRID_SIDE; ++r) {
-                // Check the farthest possible movement
-                NumberBox consideredBox = grid[r][c];
-                if (consideredBox == null) continue;
+                if (consideredBox == null) return;
 
                 grid[r][c] = null;
                 int newC = c;
 
-                for (int distance = 1; c + distance < GRID_SIDE; ++distance) {
-                    newC = c + distance;
+                for (int distance = 1; indexWithinBounds(c + distance * distMultiplier); ++distance) {
+                    newC = c + distance * distMultiplier;
                     NumberBox otherBox = grid[r][newC];
                     if (otherBox != null) {
                         // Collision
@@ -246,52 +304,92 @@ public class GameGrid implements Disposable {
                             otherBox.upgrade();
                             boxesToRemove.add(consideredBox);
                         } else {
-                            grid[r][--newC] = consideredBox;
+                            newC -= distMultiplier;
+                            grid[r][newC] = consideredBox;
                         }
                         break;
-                    } else if (newC == GRID_SIDE - 1) {
-                        // Out of bounds
+                    } else if (indexAtBound(newC))
                         grid[r][newC] = consideredBox;
-                    }
                 }
                 Vector2 coords = getSlotCoords(r, newC);
-                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, Interpolators.QUADRATIC);
-            }
-        }
+                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
+            });
+        });
     }
 
-    private void moveLeft() {
-        for (int c = 1; c < GRID_SIDE; ++c) {
-            for (int r = 0; r < GRID_SIDE; ++r) {
-                // Check the farthest possible movement
-                NumberBox consideredBox = grid[r][c];
-                if (consideredBox == null) continue;
-
-                grid[r][c] = null;
-                int newC = c;
-
-                for (int distance = 1; c - distance >= 0; ++distance) {
-                    newC = c - distance;
-                    NumberBox otherBox = grid[r][newC];
-                    if (otherBox != null) {
-                        // Collision
-                        if (otherBox.equals(consideredBox)) {
-                            otherBox.upgrade();
-                            boxesToRemove.add(consideredBox);
-                        } else {
-                            grid[r][++newC] = consideredBox;
-                        }
-                        break;
-                    } else if (newC == 0) {
-                        // Out of bounds
-                        grid[r][newC] = consideredBox;
-                    }
-                }
-                Vector2 coords = getSlotCoords(r, newC);
-                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, Interpolators.QUADRATIC);
-            }
-        }
+    private boolean indexWithinBounds(int idx) {
+        return 0 <= idx && idx < GRID_SIDE;
     }
+
+    private boolean indexAtBound(int idx) {
+        return idx == 0 || idx == GRID_SIDE - 1;
+    }
+
+//    private void moveRight() {
+//        for (int c = GRID_SIDE - 2; 0 <= c; --c) {
+//            for (int r = 0; r < GRID_SIDE; ++r) {
+//                // Check the farthest possible movement
+//                NumberBox consideredBox = grid[r][c];
+//                if (consideredBox == null) continue;
+//
+//                grid[r][c] = null;
+//                int newC = c;
+//
+//                for (int distance = 1; c + distance < GRID_SIDE; ++distance) {
+//                    newC = c + distance;
+//                    NumberBox otherBox = grid[r][newC];
+//                    if (otherBox != null) {
+//                        // Collision
+//                        if (otherBox.equals(consideredBox)) {
+//                            otherBox.upgrade();
+//                            boxesToRemove.add(consideredBox);
+//                        } else {
+//                            grid[r][--newC] = consideredBox;
+//                        }
+//                        break;
+//                    } else if (newC == GRID_SIDE - 1) {
+//                        // Out of bounds
+//                        grid[r][newC] = consideredBox;
+//                    }
+//                }
+//                Vector2 coords = getSlotCoords(r, newC);
+//                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, Interpolators.QUADRATIC);
+//            }
+//        }
+//    }
+//
+//    private void moveLeft() {
+//        for (int c = 1; c < GRID_SIDE; ++c) {
+//            for (int r = 0; r < GRID_SIDE; ++r) {
+//                // Check the farthest possible movement
+//                NumberBox consideredBox = grid[r][c];
+//                if (consideredBox == null) continue;
+//
+//                grid[r][c] = null;
+//                int newC = c;
+//
+//                for (int distance = 1; c - distance >= 0; ++distance) {
+//                    newC = c - distance;
+//                    NumberBox otherBox = grid[r][newC];
+//                    if (otherBox != null) {
+//                        // Collision
+//                        if (otherBox.equals(consideredBox)) {
+//                            otherBox.upgrade();
+//                            boxesToRemove.add(consideredBox);
+//                        } else {
+//                            grid[r][++newC] = consideredBox;
+//                        }
+//                        break;
+//                    } else if (newC == 0) {
+//                        // Out of bounds
+//                        grid[r][newC] = consideredBox;
+//                    }
+//                }
+//                Vector2 coords = getSlotCoords(r, newC);
+//                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, Interpolators.QUADRATIC);
+//            }
+//        }
+//    }
 
     public boolean isMovementPossible(Directions direction) {
         IntPredicate boundaryPredicate = switch(direction) {

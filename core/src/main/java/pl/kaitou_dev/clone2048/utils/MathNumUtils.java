@@ -1,6 +1,10 @@
 package pl.kaitou_dev.clone2048.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public class MathNumUtils {
     private static Random random = new Random();
@@ -23,5 +27,11 @@ public class MathNumUtils {
 
     public static boolean diceTest(int sides, int testVal) {
         return testVal == randInt(1, sides + 1);
+    }
+
+    public static IntStream reverseIntStream(IntStream source) {
+        List<Integer> temp = new ArrayList<>(source.boxed().toList());
+        Collections.reverse(temp);
+        return temp.stream().mapToInt(Integer::intValue);
     }
 }
