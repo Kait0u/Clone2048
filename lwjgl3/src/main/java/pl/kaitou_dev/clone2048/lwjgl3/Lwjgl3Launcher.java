@@ -3,6 +3,7 @@ package pl.kaitou_dev.clone2048.lwjgl3;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import pl.kaitou_dev.clone2048.Clone2048;
+import pl.kaitou_dev.clone2048.Constants;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
@@ -26,6 +27,9 @@ public class Lwjgl3Launcher {
         configuration.useVsync(true);
         configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate + 1);
         configuration.setWindowedMode(GAME_DESKTOP_WIDTH, GAME_DESKTOP_HEIGHT);
+        configuration.setWindowSizeLimits(
+            Constants.GAME_WIDTH, Constants.GAME_HEIGHT, Constants.MAX_WIDTH, Constants.MAX_HEIGHT
+        );
         configuration.setBackBufferConfig(8, 8, 8, 8, 16, 4, 16);
 
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
