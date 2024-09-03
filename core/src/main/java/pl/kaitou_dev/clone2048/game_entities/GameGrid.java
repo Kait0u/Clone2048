@@ -35,6 +35,8 @@ public class GameGrid implements Disposable {
     private final int secretNumber;
     private final Map<Directions, Boolean> movementPossibilities;
 
+
+
     public enum State {
         IDLE, BUSY, GAME_OVER, VICTORY
     }
@@ -136,7 +138,7 @@ public class GameGrid implements Disposable {
         }
     }
 
-    private void updateLegalMoves() {
+    public void updateLegalMoves() {
         Arrays.stream(Directions.values()).parallel()
             .forEach(direction -> movementPossibilities.put(direction, isMovementPossible(direction)));
     }
@@ -454,6 +456,10 @@ public class GameGrid implements Disposable {
 
     public boolean isVictory() {
         return state == State.VICTORY;
+    }
+
+    public boolean isBusy() {
+        return state == State.BUSY;
     }
 
     public State getState() {
