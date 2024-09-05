@@ -22,26 +22,75 @@ import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+/**
+ * A {@code GameGrid} contains the current state of the game board, with all of its {@link NumberBox}es.
+ * It contains methods for manipulating the current state of the game, control-handling and establishing
+ * the status of the current round.
+ * @see NumberBox
+ */
 public class GameGrid implements Disposable {
+    /**
+     * The length of one side of the square grid the game takes place on, in NumberBoxes.
+     */
     private static final int GRID_SIDE = 4;
+
+    /**
+     * The padding of the grid, in pixels.
+     */
     private static final int GRID_PADDING = 20;
+
+    /**
+     * The space between every two neighboring boxes, in pixels.
+     */
     private static final int SLOT_SPACING = 10;
 
+    /**
+     * The length of one side of the grid, in pixels.
+     */
     public static final int SIZE = 2 * GRID_PADDING + 4 * Constants.SLOT_SIZE + 3 * SLOT_SPACING;
+
+    /**
+     * The interpolator for various animations and activities over-time.
+     */
     public static final Interpolator DEFAULT_INTERPOLATOR = Interpolators.QUADRATIC;
 
+    /**
+     * A 2D Array representation of the current layout of {@link NumberBox}es.
+     */
     private final NumberBox[][] grid;
+
+    /**
+     * A list of boxes that will be removed as soon as events related to them have been handled.
+     */
     private final ArrayList<NumberBox> boxesToRemove;
+
+    /**
+     * A secret number that will allow for dice-throw tests.
+     */
     private final int secretNumber;
+
+    /**
+     * A map that describes whether a movement is possible in a certain direction, using a boolean flag.
+     * @see Directions
+     */
     private final Map<Directions, Boolean> movementPossibilities;
 
-
-
+    /**
+     * An enum of the states the game can find itself in, based on the {@link NumberBox} activity,
+     * as well as the layout on the grid.
+     */
     public enum State {
         IDLE, BUSY, GAME_OVER, VICTORY
     }
 
+    /**
+     * The current state of the grid, updated whenever some action is performed that could change it.
+     */
     private State state = State.IDLE;
+
+    /**
+     * A boolean flag dictating whether the {@link NumberBox}es in this grid should display their numbers or not.
+     */
     private boolean shouldShowNumbers = true;
 
 
@@ -95,9 +144,7 @@ public class GameGrid implements Disposable {
             if (box.isBusy()) {
                 box.update(delta);
                 state = State.BUSY;
-            }
-
-            else {
+            } else {
                 itBoxesToRemove.remove();
                 box.dispose();
             }
