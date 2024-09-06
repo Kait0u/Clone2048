@@ -91,18 +91,9 @@ public class FirstScreen implements Screen {
         if (timeSinceLastMove < ANIMATION_INTERVAL_SECONDS) return;
 
         if (!grid.isBusy()) {
-            Directions[] directions = Arrays.stream(Directions.values())
-                .filter(grid::isMovementPossible)
-                .toArray(Directions[]::new);
-
-            if (directions.length > 0) {
-                Directions direction = directions[MathNumUtils.randInt(directions.length)];
-                grid.move(direction);
-                grid.addNewBox();
-                grid.updateLegalMoves();
-
-                timeSinceLastMove = 0;
-            }
+            Directions[] directions = Directions.values();
+            grid.handleMovement(directions[MathNumUtils.randInt(directions.length)]);
+            if (grid.isBusy()) timeSinceLastMove = 0;
         }
     }
 

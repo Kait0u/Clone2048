@@ -250,6 +250,7 @@ public class GameGrid implements Disposable {
             move(direction);
             addNewBox();
             updateLegalMoves();
+            state = State.BUSY;
         }
     }
 
