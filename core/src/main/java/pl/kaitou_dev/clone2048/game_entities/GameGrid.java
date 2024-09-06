@@ -65,7 +65,7 @@ public class GameGrid implements Disposable {
     private final ArrayList<NumberBox> boxesToRemove;
 
     /**
-     * A secret number that will allow for dice-throw tests.
+     * A secret number that will allow for dice tests.
      */
     private final int secretNumber;
 
@@ -95,11 +95,11 @@ public class GameGrid implements Disposable {
 
 
     // Textures & Graphics
-    Texture txGridBackground, txGridSlot;
-    BoxColorPalette palette = BoxColorPalette.COLORFUL;
+    private Texture txGridBackground, txGridSlot;
+    private BoxColorPalette palette = BoxColorPalette.COLORFUL;
 
     // Geometry
-    int posX, posY;
+    private int posX, posY;
 
     public GameGrid() {
         grid = new NumberBox[GRID_SIDE][GRID_SIDE];
