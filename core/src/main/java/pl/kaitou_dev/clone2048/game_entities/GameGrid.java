@@ -95,8 +95,9 @@ public class GameGrid implements Disposable {
 
 
     // Textures & Graphics
-    private Texture txGridBackground, txGridSlot;
-    private BoxColorPalette palette = BoxColorPalette.COLORFUL;
+    private final Texture txGridBackground;
+    private final Texture txGridSlot;
+    private final BoxColorPalette palette = BoxColorPalette.COLORFUL;
 
     // Geometry
     private int posX, posY;
