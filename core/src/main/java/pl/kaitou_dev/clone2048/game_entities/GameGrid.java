@@ -95,13 +95,36 @@ public class GameGrid implements Disposable {
 
 
     // Textures & Graphics
+    /**
+     * The texture used to display the background of the grid.
+     */
     private final Texture txGridBackground;
+
+    /**
+     * The texture used to display each slot of the grid.
+     */
     private final Texture txGridSlot;
+
+    /**
+     * The color palette to be used by all of this {@code GameGrid}'s {@link NumberBox}es.
+     */
     private final BoxColorPalette palette = BoxColorPalette.COLORFUL;
 
     // Geometry
-    private int posX, posY;
 
+    /**
+     * Measures the position of the bottom-left corner's X coordinate.
+     */
+    private int posX;
+
+    /**
+     * Measures the position of the bottom-left corner's Y coordinate.
+     */
+    private int posY;
+
+    /**
+     * The default constructor.
+     */
     public GameGrid() {
         grid = new NumberBox[GRID_SIDE][GRID_SIDE];
         boxesToRemove = new ArrayList<>();
@@ -120,11 +143,20 @@ public class GameGrid implements Disposable {
         addNewBox();
     }
 
+    /**
+     * An alternate constructor that enables the caller to decide whether this {@code GameGrid}'s {@link NumberBox}es
+     * should display their numbers.
+     * @param showNumbers Whether the numbers should display (true) or not (false).
+     */
     public GameGrid(boolean showNumbers) {
         this();
         shouldShowNumbers = showNumbers;
     }
 
+    /**
+     * Prompts this {@code GameGrid}'s {@link NumberBox}es to update and evaluates if the game has to end.
+     * @param delta Delta-time at the moment of calling.
+     */
     public void update(float delta) {
         state = State.IDLE;
 
@@ -156,18 +188,29 @@ public class GameGrid implements Disposable {
         handleVictoryLoss();
     }
 
+    /**
+     * Evaluates if the game has to end, and with what result, and updates the state accordingly.
+     * @see State
+     */
     private void handleVictoryLoss() {
         if (state == State.IDLE) {
+            // Check for victory.
             boolean got2048 = isValueOnBoard(2048);
-            if (got2048) state = State.VICTORY;
-        }
+            if (got2048) {
+                state = State.VICTORY;
+                return;
+            }
 
-        if (state == State.IDLE) {
+            // Check for loss.
             boolean anyMovementPossible = movementPossibilities.values().stream().anyMatch(Boolean::booleanValue);
             if (!anyMovementPossible) state = State.GAME_OVER;
         }
     }
 
+
+    /**
+     * Handles the input related to this {@code GameGrid}.
+     */
     public void handleInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             handleMovement(Directions.UP);
@@ -186,11 +229,20 @@ public class GameGrid implements Disposable {
         }
     }
 
+    /**
+     * Updates the map of movement possibilities based on the current situation on this {@code GameGrid}.
+     */
     public void updateLegalMoves() {
         Arrays.stream(Directions.values()).parallel()
             .forEach(direction -> movementPossibilities.put(direction, isMovementPossible(direction)));
     }
 
+    /**
+     * Handles the movement on this {@code GameGrid}.
+     * Does nothing if a move in the provided direction is impossible, or a movement is already in progress.
+     * Updates the map of movement possibilities upon each successful move.
+     * @param direction The direction in which the movement is to take place.
+     */
     public void handleMovement(Directions direction) {
         if (state == State.BUSY) return;
 
@@ -201,6 +253,10 @@ public class GameGrid implements Disposable {
         }
     }
 
+    /**
+     * Handles the movement by dispatching a proper method - based on whether the movement is vertical or horizontal.
+     * @param direction The direction in which the movement is to take place.
+     */
     public void move(Directions direction) {
         switch (direction) {
             case UP, DOWN -> moveVertically(direction);
