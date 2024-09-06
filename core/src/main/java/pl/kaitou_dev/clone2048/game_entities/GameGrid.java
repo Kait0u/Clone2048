@@ -258,19 +258,23 @@ public class GameGrid implements Disposable {
      * Handles the movement by dispatching a proper method - based on whether the movement is vertical or horizontal.
      * @param direction The direction in which the movement is to take place.
      */
-    public void move(Directions direction) {
+    private void move(Directions direction) {
         switch (direction) {
             case UP, DOWN -> moveVertically(direction);
             case LEFT, RIGHT -> moveHorizontally(direction);
         }
     }
 
-
+    /**
+     * Handles vertical movement. Fails if the provided direction is not vertical.
+     * @param direction A vertical direction.
+     * @throws IllegalArgumentException if the provided direction was not vertical.
+     */
     private void moveVertically(Directions direction) {
         final int distMultiplier = switch (direction) {
             case UP -> -1;
             case DOWN -> 1;
-            default -> throw new IllegalStateException("Unexpected value: " + direction);
+            default -> throw new IllegalArgumentException("Unexpected value: " + direction);
         };
 
         IntStream rowIdxStream = (direction == Directions.DOWN
@@ -313,11 +317,16 @@ public class GameGrid implements Disposable {
 
     }
 
+    /**
+     * Handles horizontal movement. Fails if the provided direction is not horizontal.
+     * @param direction A horizontal direction.
+     * @throws IllegalArgumentException if the provided direction was not horizontal.
+     */
     private void moveHorizontally(Directions direction) {
         final int distMultiplier = switch (direction) {
             case RIGHT -> 1;
             case LEFT -> -1;
-            default -> throw new IllegalStateException("Unexpected value: " + direction);
+            default -> throw new IllegalArgumentException("Unexpected value: " + direction);
         };
 
         IntStream colIdxStream = direction == Directions.RIGHT
@@ -357,14 +366,29 @@ public class GameGrid implements Disposable {
         });
     }
 
+    /**
+     * Checks if the provided index is within this {@code GameGrid}'s bounds.
+     * @param idx The index to be tested.
+     * @return {@code true} if the index is within the bounds, {@code false} if not.
+     */
     private boolean indexWithinBounds(int idx) {
         return 0 <= idx && idx < GRID_SIDE;
     }
 
+    /**
+     * Checks if the provided index is at one of this {@code GameGrid}'s bounds.
+     * @param idx The index to be tested.
+     * @return {@code true} if the index is at one of the bounds, {@code false} if not.
+     */
     private boolean indexAtBound(int idx) {
         return idx == 0 || idx == GRID_SIDE - 1;
     }
 
+    /**
+     * Evaluates whether a movement in the provided direction is possible or not.
+     * @param direction The direction whose movement's possibility is to be evaluated.
+     * @return {@code true} if such movement in the direction is possible, {@code false} if not.
+     */
     public boolean isMovementPossible(Directions direction) {
         IntPredicate boundaryPredicate = switch(direction) {
             case UP, LEFT -> (v -> v < GRID_SIDE - 1);
@@ -390,6 +414,13 @@ public class GameGrid implements Disposable {
         return false;
     }
 
+    /**
+     * Gets the contents of a neighbor-slot of the slot that is described by the pair of indices.
+     * @param row The row index.
+     * @param col The column index.
+     * @param side The direction of the neighbor, relative to the slot given by the row-column coordinates.
+     * @return The neighboring {@link NumberBox} or null, if the neighbor slot is empty.
+     */
     public NumberBox getNeighbor(int row, int col, Directions side) {
         return switch(side) {
             case DOWN -> (row - 1 >= 0) ? grid[row - 1][col] : null;
@@ -399,6 +430,13 @@ public class GameGrid implements Disposable {
         };
     }
 
+    /**
+     * Gets all 4 neighbors of a slot given by
+     * @param row The row index.
+     * @param col The column index.
+     * @return {@link Directions}-to-neighbor map.
+     * @see #getNeighbor(int, int, Directions)
+     */
     public HashMap<Directions, NumberBox> getNeighbors(int row, int col) {
         HashMap<Directions, NumberBox> neighbors = new HashMap<>();
 
@@ -408,6 +446,12 @@ public class GameGrid implements Disposable {
         return neighbors;
     }
 
+    /**
+     * Returns the indices of the provided {@link NumberBox} in this {@code GameGrid}.
+     * @param box The {@code NumberBox} to look for.
+     * @return A {@code Vector2} consisting of the row- and column indices,
+     * or {@code null} if the box was not found in this grid.
+     */
     public Vector2 getIndices(NumberBox box) {
         for (int r = 0; r < GRID_SIDE; ++r) {
             for (int c = 0; c < GRID_SIDE; ++c) {
@@ -419,18 +463,25 @@ public class GameGrid implements Disposable {
         return null;
     }
 
+    /**
+     * Adds a new {@link NumberBox} to this {@code GameGrid}.
+     * There is 90% chance that the box will have the value of 2, and 10% chance that it will have the value of 4.
+     */
     public void addNewBox() {
         int value = MathNumUtils.diceTest(10, secretNumber) ? 4 : 2;
         addNewBox(value);
     }
 
+    /**
+     * Adds a new {@link NumberBox} of the specified value.
+     * @param value The value for the box to have. (Must be a power of 2!)
+     */
     public void addNewBox(int value) {
         Vector2 indices = randomEmptyIndices();
 
         if (indices != null) {
             int r = (int) indices.x;
             int c = (int) indices.y;
-
 
             NumberBox newBox = new NumberBox(this, value);
             grid[r][c] = newBox;
@@ -441,6 +492,10 @@ public class GameGrid implements Disposable {
 
     }
 
+    /**
+     * Gets a list of {@code Vector2}s representing coordinates of all empty slots in this {@code GameGrid}.
+     * @return A list of slot-indices without any box inside of them.
+     */
     private ArrayList<Vector2> getEmptyIndices() {
         ArrayList<Vector2> emptyIndices = new ArrayList<>();
 
@@ -454,6 +509,10 @@ public class GameGrid implements Disposable {
         return emptyIndices;
     }
 
+    /**
+     * Gets a pair of indices for a random empty slot in this {@code GameGrid}.
+     * @return A {@code Vector2} of indices for a random empty slot, or {@code null} if the grid has no empty slots.
+     */
     private Vector2 randomEmptyIndices() {
         ArrayList<Vector2> emptyIndices = getEmptyIndices();
         if (emptyIndices.isEmpty()) return null;
@@ -461,11 +520,19 @@ public class GameGrid implements Disposable {
         return emptyIndices.get(MathNumUtils.randInt(emptyIndices.size()));
     }
 
+    /**
+     * Draws the grid along with its slots.
+     * @param batch The batch used in the current rendering process.
+     */
     public void drawGrid(SpriteBatch batch) {
         batch.draw(txGridBackground, posX, posY);
         drawSlots(batch);
     }
 
+    /**
+     * Draws the slots of the grid.
+     * @param batch The batch used in the current rendering process.
+     */
     private void drawSlots(Batch batch) {
         for (int r = 0; r < GRID_SIDE; ++r) {
             for (int c = 0; c < GRID_SIDE; ++c) {
@@ -477,6 +544,10 @@ public class GameGrid implements Disposable {
         }
     }
 
+    /**
+     * Prompts all of this {@code GameGrid}'s {@link NumberBox}es to be drawn.
+     * @param batch The batch used in the current rendering process.
+     */
     public void drawBoxes(SpriteBatch batch) {
         for (NumberBox box: boxesToRemove) {
             box.draw(batch);
@@ -489,6 +560,12 @@ public class GameGrid implements Disposable {
         }
     }
 
+    /**
+     * Gets the X, Y coordinates of the slot given by row, column indices.
+     * @param row Row-index.
+     * @param col Column-index.
+     * @return A {@code Vector2} of X, Y coordinates for the designated slot.
+     */
     public Vector2 getSlotCoords(int row, int col) {
         int x = posX + GRID_PADDING + (Constants.SLOT_SIZE + SLOT_SPACING) * col;
         int y = posY + SIZE - (GRID_PADDING + SLOT_SPACING * row + Constants.SLOT_SIZE * (row + 1));
@@ -496,6 +573,9 @@ public class GameGrid implements Disposable {
         return new Vector2(x, y);
     }
 
+    /**
+     * Disposes of this {@code GameGrid}'s resources, and of its {@link NumberBox}es' resources as well.
+     */
     @Override
     public void dispose() {
         txGridBackground.dispose();
@@ -512,6 +592,10 @@ public class GameGrid implements Disposable {
     }
 
 
+    /**
+     * Gets a String-representation of the current state of this {@code GameGrid}.
+     * @return A multi-line String representing the current state of this {@code GameGrid}.
+     */
     public String toString() {
         String nullString = "[    ]";
         StringBuilder sb = new StringBuilder();
@@ -526,6 +610,13 @@ public class GameGrid implements Disposable {
         return sb.toString();
     }
 
+    /**
+     * Sets the current X, Y coordinates,
+     * so that this {@code GameGrid} can provide its {@link NumberBox}es
+     * with appropriate coordinates.
+     * @param x X-coordinate.
+     * @param y Y-coordinate.
+     */
     public void setCoords(int x, int y) {
         posX = x;
         posY = y;
@@ -533,6 +624,9 @@ public class GameGrid implements Disposable {
         updateBoxCoords();
     }
 
+    /**
+     * Updates all of this {@code GameGrid}'s {@link NumberBox}es' X, Y coordinates.
+     */
     private void updateBoxCoords() {
         IntStream.range(0, GRID_SIDE).parallel().forEach(r -> {
             IntStream.range(0, GRID_SIDE).parallel().forEach(c -> {
@@ -545,32 +639,62 @@ public class GameGrid implements Disposable {
         });
     }
 
+    /**
+     * Gets the color palette of this {@code GameGrid}.
+     * @return The {@link BoxColorPalette} of this {@code GameGrid}.
+     */
     public BoxColorPalette getPalette() {
         return palette;
     }
 
+    /**
+     * Checks if the provided value exists on the board.
+     * @param value The value to be checked.
+     * @return {@code true} if such a value exists on the board, {@code false} if not.
+     */
     public boolean isValueOnBoard(int value) {
         if (!MathNumUtils.isPowerOfTwo(value)) return false;
 
         return Stream.of(grid).flatMap(Stream::of).filter(Objects::nonNull).anyMatch(box -> box.getValue() == value);
     }
 
+    /**
+     * Checks if this {@code GameGrid}'s layout indicates a loss.
+     * @return {@code true} if the game is lost, {@code false} if not.
+     */
     public boolean isGameOver() {
         return state == State.GAME_OVER;
     }
 
+    /**
+     * Checks if this {@code GameGrid}'s layout indicates a victory.
+     * @return {@code true} if the game is won, {@code false} if not.
+     */
     public boolean isVictory() {
         return state == State.VICTORY;
     }
 
+    /**
+     * Checks if this {@code GameGrid} is (its {@link NumberBox}es are) busy.
+     * @return {@code true} if busy, {@code false} if not.
+     */
     public boolean isBusy() {
         return state == State.BUSY;
     }
 
+    /**
+     * Gets the current state of this {@code GameGrid}.
+     * @return The current state of this {@code GameGrid}.
+     * @see State
+     */
     public State getState() {
         return state;
     }
 
+    /**
+     * Checks if this {@code GameGrid}'s {@link NumberBox}es should display their numbers.
+     * @return {@code true} if the boxes should display their numbers, {@code false} if not.
+     */
     public boolean isShouldShowNumbers() {
         return shouldShowNumbers;
     }
