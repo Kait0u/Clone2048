@@ -3,11 +3,46 @@ package pl.kaitou_dev.clone2048.game_entities.number_box.actions;
 import pl.kaitou_dev.clone2048.game_entities.number_box.NumberBox;
 import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
 
+/**
+ * A specialized {@link BoxAction} which performs a movement of its {@link NumberBox} on the screen.
+ */
 public class BoxMoveAction extends BoxAction {
-    private int destX, destY, startX, startY;
-    private float durationSeconds;
+    /**
+     * The X coordinate of the starting point.
+     */
+    private final int startX;
+    /**
+     * The Y coordinate of the starting point.
+     */
+    private final int startY;
+
+    /**
+     * The X coordinate of the destination point.
+     */
+    private final int destX;
+    /**
+     * The Y coordinate of the destination point.
+     */
+    private final int destY;
+
+    /**
+     * The duration of this {@code BoxMoveAction}, measured in seconds.
+     */
+    private final float durationSeconds;
+    /**
+     * Measures how much time has passed since the start of this {@code BoxMoveAction}.
+     */
     private float elapsedSeconds;
 
+    /**
+     * The default constructor, which takes a reference to the relevant {@link NumberBox}, takes the coordinates of
+     * the destination point, the duration of the movement and the interpolation method.
+     * @param box The {@code NumberBox} this {@code BoxAction} will be applied to.
+     * @param destX The X coordinate of the destination point.
+     * @param destY The Y coordinate of the destination point.
+     * @param durationSeconds The duration of this {@code BoxMoveAction}, measured in seconds.
+     * @param interpolator The {@link Interpolator} to be used for interpolation.
+     */
     public BoxMoveAction(NumberBox box, int destX, int destY, float durationSeconds, Interpolator interpolator) {
         super(box, interpolator);
 
@@ -18,10 +53,6 @@ public class BoxMoveAction extends BoxAction {
 
         this.startX = box.getPosX();
         this.startY = box.getPosY();
-    }
-
-    public BoxMoveAction(NumberBox box, int destX, int destY, float durationSeconds) {
-        this(box, destX, destY, durationSeconds, null);
     }
 
     @Override

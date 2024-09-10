@@ -30,6 +30,7 @@ class BlinkerAction extends Action {
     private boolean isCurrentlyOn;
 
     public BlinkerAction(double offTimeSeconds, double onTimeSeconds, boolean startOn) {
+        super();
         this.offTimeSeconds = offTimeSeconds;
         this.onTimeSeconds = onTimeSeconds;
 

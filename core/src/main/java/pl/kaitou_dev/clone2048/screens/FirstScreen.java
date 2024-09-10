@@ -18,8 +18,6 @@ import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
 import pl.kaitou_dev.clone2048.utils.MathNumUtils;
 import pl.kaitou_dev.clone2048.utils.timed_actions.Blinker;
 
-import java.util.Arrays;
-
 /** First screen of the application. Displayed after the application is created. */
 public class FirstScreen implements Screen {
     private final static float ANIMATION_INTERVAL_SECONDS = 1.0f;
@@ -103,19 +101,7 @@ public class FirstScreen implements Screen {
         // Draw your screen here. "delta" is the time since last render in seconds.
         ScreenUtils.clear(new Color(0xFFCCBFFF));
 
-        viewport.apply();
-        frameBuffer.begin();
-        Gdx.gl.glClearColor(1, 1, 1, 0);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-
-        grid.drawGrid(batch);
-        grid.drawBoxes(batch);
-
-        batch.end();
-        Pixmap pixmap = Pixmap.createFromFrameBuffer(0, 0, frameBuffer.getWidth(), frameBuffer.getHeight());
-        frameBuffer.end();
+        Pixmap pixmap = createGridPixmap();
 
         Texture gridTexture = new Texture(pixmap);
         pixmap.dispose();
@@ -146,6 +132,23 @@ public class FirstScreen implements Screen {
         gridTexture.dispose();
 
         handleInput();
+    }
+
+    private Pixmap createGridPixmap() {
+        viewport.apply();
+        frameBuffer.begin();
+        Gdx.gl.glClearColor(1, 1, 1, 0);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+
+        grid.drawGrid(batch);
+        grid.drawBoxes(batch);
+
+        batch.end();
+        Pixmap pixmap = Pixmap.createFromFrameBuffer(0, 0, frameBuffer.getWidth(), frameBuffer.getHeight());
+        frameBuffer.end();
+        return pixmap;
     }
 
     private void handleInput() {
