@@ -95,11 +95,13 @@ public class GameGrid implements Disposable {
 
 
     // Textures & Graphics
-    Texture txGridBackground, txGridSlot;
-    BoxColorPalette palette = BoxColorPalette.COLORFUL;
+    private final Texture txGridBackground;
+    private final Texture txGridSlot;
+    private BoxColorPalette palette = BoxColorPalette.COLORFUL;
 
     // Geometry
-    int posX, posY;
+    private int posX;
+    private int posY;
 
     public GameGrid() {
         grid = new NumberBox[GRID_SIDE][GRID_SIDE];
