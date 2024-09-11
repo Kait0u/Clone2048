@@ -90,7 +90,7 @@ public class FirstScreen implements Screen {
 
         if (!grid.isBusy()) {
             Directions[] directions = Directions.values();
-            grid.handleMovement(directions[MathNumUtils.randInt(directions.length)]);
+            grid.move(directions[MathNumUtils.randInt(directions.length)]);
             if (grid.isBusy()) timeSinceLastMove = 0;
         }
     }
