@@ -335,23 +335,20 @@ public class GameGrid implements Disposable {
             case DOWN, RIGHT -> (v -> v > 0);
         };
 
-        for (int r = 0; r < GRID_SIDE; ++r) {
-            for (int c = 0; c < GRID_SIDE; ++c) {
+        return IntStream.range(0, GRID_SIDE).parallel().anyMatch(r ->
+            IntStream.range(0, GRID_SIDE).anyMatch(c -> {
                 NumberBox consideredBox = grid[r][c];
                 NumberBox neighbor = getNeighbor(r, c, direction);
 
-                int boundaryTestVal = switch (direction) {
-                    case UP, DOWN -> r;
-                    case LEFT, RIGHT -> c;
-                };
+                int boundaryTestVal = direction.isVertical() ? r : c;
 
                 if (consideredBox == null) {
-                    if (boundaryPredicate.test(boundaryTestVal)) return true;
-                } else if (consideredBox.equals(neighbor)) return true;
-            }
-        }
-
-        return false;
+                    return boundaryPredicate.test(boundaryTestVal);
+                } else {
+                    return consideredBox.equals(neighbor);
+                }
+            })
+        );
     }
 
     /**
@@ -363,10 +360,10 @@ public class GameGrid implements Disposable {
      */
     public NumberBox getNeighbor(int row, int col, Directions side) {
         return switch(side) {
-            case DOWN -> (row - 1 >= 0) ? grid[row - 1][col] : null;
-            case UP -> (row + 1 < GRID_SIDE) ? grid[row + 1][col] : null;
-            case LEFT -> (col - 1 >= 0) ? grid[row][col - 1] : null;
-            case RIGHT -> (col + 1 < GRID_SIDE) ? grid[row][col + 1] : null;
+            case DOWN -> indexWithinBounds(row - 1) ? grid[row - 1][col] : null;
+            case UP -> indexWithinBounds(row + 1) ? grid[row + 1][col] : null;
+            case LEFT -> indexWithinBounds(col - 1) ? grid[row][col - 1] : null;
+            case RIGHT -> indexWithinBounds(col + 1) ? grid[row][col + 1] : null;
         };
     }
 
