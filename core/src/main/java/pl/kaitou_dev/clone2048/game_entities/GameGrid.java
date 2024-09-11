@@ -1,7 +1,6 @@
 package pl.kaitou_dev.clone2048.game_entities;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,6 +11,7 @@ import com.badlogic.gdx.utils.Disposable;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.number_box.BoxColorPalette;
 import pl.kaitou_dev.clone2048.game_entities.number_box.NumberBox;
+import pl.kaitou_dev.clone2048.utils.ControlUtils;
 import pl.kaitou_dev.clone2048.utils.MathNumUtils;
 import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
 import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
@@ -161,12 +161,11 @@ public class GameGrid implements Disposable {
         state = State.IDLE;
 
         for (NumberBox[] row : grid) {
-            for (NumberBox box : row) {
-                if (box != null) {
-                    box.update(delta);
-                    if (box.isBusy()) state = State.BUSY;
-                }
-            }
+            boolean anyBusy = Arrays.stream(row).parallel().filter(Objects::nonNull).anyMatch(box -> {
+                box.update(delta);      // Update the box
+                return box.isBusy();    // See if it's busy and return the result.
+            });
+            if (anyBusy) state = State.BUSY;
         }
 
         // For boxes to remove
@@ -212,20 +211,13 @@ public class GameGrid implements Disposable {
      * Handles the input related to this {@code GameGrid}.
      */
     public void handleInput() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            handleMovement(Directions.UP);
-        }
+        Set<Integer> directionalKeys = ControlUtils.getDirectionKeys();
 
-        else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            handleMovement(Directions.DOWN);
-        }
-
-        else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            handleMovement(Directions.LEFT);
-        }
-
-        else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            handleMovement(Directions.RIGHT);
+        for (Integer gdxKey : directionalKeys) {
+            if (Gdx.input.isKeyPressed(gdxKey)) {
+                move(ControlUtils.getDirection(gdxKey));
+                break;
+            }
         }
     }
 
@@ -242,12 +234,13 @@ public class GameGrid implements Disposable {
      * Does nothing if a move in the provided direction is impossible, or a movement is already in progress.
      * Updates the map of movement possibilities upon each successful move.
      * @param direction The direction in which the movement is to take place.
+     * @see GameGrid#handleMovement(Directions)
      */
-    public void handleMovement(Directions direction) {
+    public void move(Directions direction) {
         if (state == State.BUSY) return;
 
         if (movementPossibilities.get(direction)) {
-            move(direction);
+            handleMovement(direction);
             addNewBox();
             updateLegalMoves();
             state = State.BUSY;
@@ -255,112 +248,59 @@ public class GameGrid implements Disposable {
     }
 
     /**
-     * Handles the movement by dispatching a proper method - based on whether the movement is vertical or horizontal.
+     * Handles the movement, based on the direction. It establishes the individual {@link NumberBox}es' positions
+     * on this grid, and equips them with movement animations.
      * @param direction The direction in which the movement is to take place.
      */
-    private void move(Directions direction) {
-        switch (direction) {
-            case UP, DOWN -> moveVertically(direction);
-            case LEFT, RIGHT -> moveHorizontally(direction);
-        }
-    }
+    private void handleMovement(Directions direction) {
+        boolean isVertical = direction.isVertical();
+        boolean isPositive = direction.isPositive();
+        final int distMultiplier = isVertical
+            ? (isPositive ? -1 : 1)
+            : (isPositive ? 1 : -1);
 
-    /**
-     * Handles vertical movement. Fails if the provided direction is not vertical.
-     * @param direction A vertical direction.
-     * @throws IllegalArgumentException if the provided direction was not vertical.
-     */
-    private void moveVertically(Directions direction) {
-        final int distMultiplier = switch (direction) {
-            case UP -> -1;
-            case DOWN -> 1;
-            default -> throw new IllegalArgumentException("Unexpected value: " + direction);
-        };
+        IntStream primaryStream = IntStream.range(0, GRID_SIDE);
 
-        IntStream rowIdxStream = (direction == Directions.DOWN
-            ? MathNumUtils.reverseIntStream(IntStream.range(0, GRID_SIDE))
-            : IntStream.range(0, GRID_SIDE));
+        if (direction == Directions.DOWN || direction == Directions.RIGHT)
+            primaryStream = MathNumUtils.reverseIntStream(primaryStream);
 
-        rowIdxStream = rowIdxStream.skip(1);
+        primaryStream = primaryStream.skip(1);
 
-        rowIdxStream.forEach(r -> {
-            IntStream colIdxStream = IntStream.range(0, GRID_SIDE);
-            colIdxStream.forEach(c -> {
-                NumberBox consideredBox = grid[r][c];
+        primaryStream.forEach(primaryIdx -> {
+            IntStream secondaryStream = IntStream.range(0, GRID_SIDE);
+            secondaryStream.forEach(secondaryIdx -> {
+                NumberBox consideredBox = isVertical ? grid[primaryIdx][secondaryIdx] : grid[secondaryIdx][primaryIdx];
                 if (consideredBox == null) return;
 
-                grid[r][c] = null;
-                int newR = r;
+                if (isVertical) grid[primaryIdx][secondaryIdx] = null;
+                else grid[secondaryIdx][primaryIdx] = null;
 
-                for (int distance = 1; indexWithinBounds(r + distance * distMultiplier); ++distance) {
-                    newR = r + distance * distMultiplier;
-                    NumberBox otherBox = grid[newR][c];
+                int newIdx = primaryIdx;
+
+                for (int distance = 1; indexWithinBounds(primaryIdx + distance * distMultiplier); ++distance) {
+                    newIdx = primaryIdx + distance * distMultiplier;
+                    NumberBox otherBox = isVertical ? grid[newIdx][secondaryIdx] : grid[secondaryIdx][newIdx];
 
                     if (otherBox != null) {
                         if (otherBox.equals(consideredBox)) {
                             otherBox.upgrade();
                             boxesToRemove.add(consideredBox);
                         } else {
-                            newR -= distMultiplier;
-                            grid[newR][c] = consideredBox;
+                            newIdx -= distMultiplier;
+                            if (isVertical) grid[newIdx][secondaryIdx] = consideredBox;
+                            else grid[secondaryIdx][newIdx] = consideredBox;
                         }
                         break;
-                    } else if (indexAtBound(newR)) {
-                        grid[newR][c] = consideredBox;
+                    } else if (indexAtBound(newIdx)) {
+                        if (isVertical) grid[newIdx][secondaryIdx] = consideredBox;
+                        else grid[secondaryIdx][newIdx] = consideredBox;
                     }
                 }
 
-                Vector2 coords = getSlotCoords(newR, c);
-                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
-            });
-        });
+                Vector2 coords = isVertical
+                    ? getSlotCoords(newIdx, secondaryIdx)
+                    : getSlotCoords(secondaryIdx, newIdx);
 
-    }
-
-    /**
-     * Handles horizontal movement. Fails if the provided direction is not horizontal.
-     * @param direction A horizontal direction.
-     * @throws IllegalArgumentException if the provided direction was not horizontal.
-     */
-    private void moveHorizontally(Directions direction) {
-        final int distMultiplier = switch (direction) {
-            case RIGHT -> 1;
-            case LEFT -> -1;
-            default -> throw new IllegalArgumentException("Unexpected value: " + direction);
-        };
-
-        IntStream colIdxStream = direction == Directions.RIGHT
-            ? MathNumUtils.reverseIntStream(IntStream.range(0, GRID_SIDE))
-            : IntStream.range(0, GRID_SIDE);
-
-        colIdxStream = colIdxStream.skip(1);
-
-        colIdxStream.forEach(c -> {
-            IntStream rowIdxStream = IntStream.range(0, GRID_SIDE);
-            rowIdxStream.forEach(r -> {
-                NumberBox consideredBox = grid[r][c];
-                if (consideredBox == null) return;
-
-                grid[r][c] = null;
-                int newC = c;
-
-                for (int distance = 1; indexWithinBounds(c + distance * distMultiplier); ++distance) {
-                    newC = c + distance * distMultiplier;
-                    NumberBox otherBox = grid[r][newC];
-                    if (otherBox != null) {
-                        // Collision
-                        if (otherBox.equals(consideredBox)) {
-                            otherBox.upgrade();
-                            boxesToRemove.add(consideredBox);
-                        } else {
-                            newC -= distMultiplier;
-                            grid[r][newC] = consideredBox;
-                        }
-                        break;
-                    } else if (indexAtBound(newC))
-                        grid[r][newC] = consideredBox;
-                }
-                Vector2 coords = getSlotCoords(r, newC);
                 consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
             });
         });
