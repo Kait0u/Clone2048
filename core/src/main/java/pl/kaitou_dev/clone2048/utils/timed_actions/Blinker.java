@@ -79,6 +79,11 @@ class BlinkerAction extends Action {
         if (shouldToggle) toggle();
     }
 
+    /**
+     * Toggles the blinker.
+     * The first toggle causes the on/off status to change.
+     * The second toggle marks this {@code BlinkerAction} as done.
+     */
     private void toggle() {
         if (startOn) {
             if (isCurrentlyOn) {
@@ -96,6 +101,9 @@ class BlinkerAction extends Action {
         }
     }
 
+    /**
+     * Resets the timer.
+     */
     public void resetTimer() {
         timeElapsed = 0;
     }
@@ -107,6 +115,10 @@ class BlinkerAction extends Action {
         isCurrentlyOn = startOn;
     }
 
+    /**
+     * Checks if the blinker is on, or not.
+     * @return {@code true} if the blinker is on, {@code false} if not.
+     */
     public boolean isOn() {
         return isCurrentlyOn;
     }
