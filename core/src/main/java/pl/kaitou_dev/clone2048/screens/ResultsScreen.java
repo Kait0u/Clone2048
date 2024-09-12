@@ -15,21 +15,58 @@ import pl.kaitou_dev.clone2048.utils.FontUtils;
 import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
 import pl.kaitou_dev.clone2048.utils.timed_actions.Blinker;
 
+/**
+ * The results screen of the application. Its contents are dependent on the result of the game.
+ */
 public class ResultsScreen implements Screen {
+    /**
+     * The {@link Game} instance, required for switching between the screens.
+     */
     private final Game game;
+    /**
+     * The {@link Camera} for graphics.
+     */
     private final OrthographicCamera camera;
+    /**
+     * The {@link com.badlogic.gdx.utils.viewport.Viewport} to make the window scale well while on this screen.
+     */
     private final FitViewport viewport;
+    /**
+     * The {@link SpriteBatch} to render everything onto.
+     */
     private final SpriteBatch batch;
-
+    /**
+     * A {@link Blinker} that will cause prompts to blink.
+     */
     private final Blinker blinker;
 
+    /**
+     * A font to be used to render the heading.
+     */
     private final BitmapFont fontHeading;
+    /**
+     * A font to be used to render the text and prompts.
+     */
     private final BitmapFont fontText;
 
+    /**
+     * The text to be displayed as the heading.
+     */
     private final String headingText;
 
+    /**
+     * The sprite that represents the final situation on the {@link GameGrid}.
+     */
     private final Sprite gridSprite;
 
+    /**
+     * The default constructor, which prepares the screen by accepting a reference to the {@link Game},
+     * as well as prepares the results view by accepting the {@link GameGrid} of the last game,
+     * and the result of the game.
+     * @param game An instance of the current {@link Game} object.
+     * @param grid The {@code GameGrid} from the previous screen.
+     * @param gameResult The result coming from the previous screen.
+     */
     public ResultsScreen(Game game, GameGrid grid, Constants.GameResult gameResult) {
         this.game = game;
         camera = new OrthographicCamera();
@@ -57,6 +94,10 @@ public class ResultsScreen implements Screen {
         blinker.start();
     }
 
+    /**
+     * Updates this screen's children using the delta-time.
+     * @param delta The delta-time.
+     */
     public void update(float delta) {
         blinker.actWithDelta(delta);
     }
@@ -79,7 +120,6 @@ public class ResultsScreen implements Screen {
                 batch, "Press ENTER to return to the Main Menu", fontText, Constants.GAME_WIDTH / 2, 100
         );
 
-
         int w = gridSprite.getRegionWidth() / 2;
         int h = gridSprite.getRegionHeight() / 2;
 
@@ -89,6 +129,9 @@ public class ResultsScreen implements Screen {
         handleInput();
     }
 
+    /**
+     * Handles the input for this screen.
+     */
     private void handleInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             game.setScreen(new FirstScreen(game));
@@ -96,6 +139,11 @@ public class ResultsScreen implements Screen {
         }
     }
 
+    /**
+     * Turns the {@link GameGrid} into a sprite, for resource efficiency.
+     * @param grid The {@code GameGrid} from the previous screen.
+     * @return A {@link Sprite} representing the final situation on the grid.
+     */
     private Sprite getGridSprite(GameGrid grid) {
         FrameBuffer frameBuffer = new FrameBuffer(
             Pixmap.Format.RGBA8888, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, true
@@ -131,19 +179,13 @@ public class ResultsScreen implements Screen {
     }
 
     @Override
-    public void pause() {
-
-    }
+    public void pause() {}
 
     @Override
-    public void resume() {
-
-    }
+    public void resume() {}
 
     @Override
-    public void hide() {
-
-    }
+    public void hide() {}
 
     @Override
     public void dispose() {
