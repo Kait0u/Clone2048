@@ -98,7 +98,7 @@ public class BoxColorPalette {
     /**
      * Gets a color based on a binary power provided.
      * @param binaryPower The binary power, the color corresponding to which to get.
-     * @return
+     * @return A {@link Color} corresponding to the provided binary power.
      */
     public Color getColor(long binaryPower) {
         return colors.get(binaryPower);

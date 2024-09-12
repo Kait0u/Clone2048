@@ -9,10 +9,23 @@ import java.util.List;
  */
 public enum Directions {
     // Vertical
+    /**
+     * Represents the upward direction. It is positive and vertical.
+     */
     UP(true, true),
+    /**
+     * Represents the downward direction. It is negative and vertical.
+     */
     DOWN(false, true),
+
     // Horizontal
+    /**
+     * Represents the leftward direction. It is negative and horizontal.
+     */
     LEFT(false, false),
+    /**
+     * Represents the rightward direction. It is positive and horizontal.
+     */
     RIGHT(true, false);
 
     /**

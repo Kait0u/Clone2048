@@ -3,7 +3,6 @@ package pl.kaitou_dev.clone2048.utils.timed_actions;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
-import java.util.Stack;
 
 public class SequentialAction extends Action {
     private final Queue<Action> actions;

@@ -185,18 +185,34 @@ public class NumberBox {
         return value;
     }
 
+    /**
+     * Gets the X coordinate of this {@code NumberBox} on the screen.
+     * @return The X coordinate of this {@code NumberBox} on the screen.
+     */
     public int getPosX() {
         return posX;
     }
 
+    /**
+     * Sets the X coordinate of this {@code NumberBox} on the screen.
+     * @param posX The new value for the X coordinate.
+     */
     public void setPosX(int posX) {
         this.posX = posX;
     }
 
+    /**
+     * Gets the Y coordinate of this {@code NumberBox} on the screen.
+     * @return The Y coordinate of this {@code NumberBox} on the screen.
+     */
     public int getPosY() {
         return posY;
     }
 
+    /**
+     * Sets the Y coordinate of this {@code NumberBox} on the screen.
+     * @param posY The new value for the Y coordinate.
+     */
     public void setPosY(int posY) {
         this.posY = posY;
     }

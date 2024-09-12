@@ -1,9 +1,6 @@
 package pl.kaitou_dev.clone2048.utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.IntStream;
 
 /**
@@ -13,7 +10,7 @@ public class MathNumUtils {
     /**
      * The source of randomness for random number generation.
      */
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     /**
      * Sets the seed for the random number generator.
@@ -49,6 +46,18 @@ public class MathNumUtils {
      */
     public static int randInt(int maxExclusive) {
         return random.nextInt(maxExclusive);
+    }
+
+    /**
+     * Chooses one of multiple provided options of the same type.
+     * @param options Options to choose from.
+     * @return One of the options provided, chosen at random.
+     * @param <T> The type of the options provided.
+     */
+    @SafeVarargs
+    public static <T> T randChoice(T... options) {
+        if (options == null || options.length == 0) throw new IllegalArgumentException("Illegal options!");
+        return options[MathNumUtils.randInt(options.length)];
     }
 
     /**

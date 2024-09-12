@@ -55,6 +55,10 @@ public class ControlUtils {
         return keysDirectionsMap.getOrDefault(gdxKey, null);
     }
 
+    /**
+     * Checks if any key has been <b>just</b> pressed.
+     * @return {@code true} if any key has just been pressed, {@code false} otherwise.
+     */
     public boolean isAnyKeyJustPressed() {
         return Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY);
     }

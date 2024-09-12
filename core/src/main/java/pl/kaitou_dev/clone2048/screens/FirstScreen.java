@@ -18,24 +18,70 @@ import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
 import pl.kaitou_dev.clone2048.utils.MathNumUtils;
 import pl.kaitou_dev.clone2048.utils.timed_actions.Blinker;
 
-/** First screen of the application. Displayed after the application is created. */
+/**
+ * First screen of the application. Displayed after the application is created.
+ */
 public class FirstScreen implements Screen {
+    /**
+     * The animation interval, measured in seconds.
+     * It measures how often this screen's animation should happen.
+     */
     private final static float ANIMATION_INTERVAL_SECONDS = 1.0f;
 
+    /**
+     * The {@link Game} instance, required for switching between the screens.
+     */
     private final Game game;
+
+    /**
+     * The {@link Camera} for graphics.
+     */
     private final OrthographicCamera camera;
+    /**
+     * The {@link com.badlogic.gdx.utils.viewport.Viewport} to make the window scale well while on this screen.
+     */
     private final FitViewport viewport;
+    /**
+     * The {@link SpriteBatch} to render everything onto.
+     */
     private final SpriteBatch batch;
+    /**
+     * A {@link FrameBuffer} to act as a virtual screen on this screen, to display the animation.
+     */
     private final FrameBuffer frameBuffer;
 
+    /**
+     * A font to be used to render the logo.
+     */
     private final BitmapFont fontLogo;
+    /**
+     * A font to be used to render prompts.
+     */
     private final BitmapFont fontText;
+    /**
+     * A font to be used to render the credits.
+     */
     private final BitmapFont fontCredits;
 
+    // Animation-related
+    /**
+     * A {@link GameGrid} to animate.
+     */
     private GameGrid grid;
+    /**
+     * The time elapsed since the last move of the animation, measured in seconds.
+     */
     private float timeSinceLastMove = 0;
+    /**
+     * A {@link Blinker} that will cause prompts to blink.
+     */
     private final Blinker blinker;
 
+    /**
+     * The default constructor, which takes a reference to the {@link Game} object
+     * and sets up the basic components to display the screen.
+     * @param game An instance of the current {@link Game} object.
+     */
     public FirstScreen(Game game) {
         this.game = game;
 
@@ -70,6 +116,11 @@ public class FirstScreen implements Screen {
         blinker.start();
     }
 
+    /**
+     * Updates the children objects of this screen using the delta-time.
+     * Controls the flow of the animation, and restarts it if it is necessary.
+     * @param delta The delta-time.
+     */
     public void update(float delta) {
         blinker.actWithDelta(delta);
 
@@ -85,12 +136,17 @@ public class FirstScreen implements Screen {
         timeSinceLastMove += delta;
     }
 
+    /**
+     * Handles the animation of the grid, by trying to issue a random move to this screen's {@link GameGrid}
+     * every {@link FirstScreen#ANIMATION_INTERVAL_SECONDS} seconds. The timer does not reset if the move was illegal,
+     * so that it has a chance to make a correct guess next time this method is called.
+     */
     private void animateGrid() {
         if (timeSinceLastMove < ANIMATION_INTERVAL_SECONDS) return;
 
         if (!grid.isBusy()) {
             Directions[] directions = Directions.values();
-            grid.move(directions[MathNumUtils.randInt(directions.length)]);
+            grid.move(MathNumUtils.randChoice(directions));
             if (grid.isBusy()) timeSinceLastMove = 0;
         }
     }
@@ -134,6 +190,10 @@ public class FirstScreen implements Screen {
         handleInput();
     }
 
+    /**
+     * Creates a {@link Pixmap} out of this screen's {@link GameGrid} using a {@link FrameBuffer}.
+     * @return A {@code Pixmap} of the current situation of the grid.
+     */
     private Pixmap createGridPixmap() {
         viewport.apply();
         frameBuffer.begin();
@@ -151,6 +211,9 @@ public class FirstScreen implements Screen {
         return pixmap;
     }
 
+    /**
+     * Handles the input on this screen.
+     */
     private void handleInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             game.setScreen(new GameScreen(game));

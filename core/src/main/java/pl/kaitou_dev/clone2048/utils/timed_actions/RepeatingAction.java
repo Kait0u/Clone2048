@@ -1,11 +1,11 @@
 package pl.kaitou_dev.clone2048.utils.timed_actions;
 
-public class RepeatingAction<A extends Action> extends Action {
+public class RepeatingAction extends Action {
     private final int iterations;
     private int currIteration;
-    private final A action;
+    private final Action action;
 
-    public RepeatingAction(int nTimes, A action) {
+    public RepeatingAction(int nTimes, Action action) {
         super();
 
         this.iterations = nTimes;

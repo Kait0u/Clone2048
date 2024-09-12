@@ -80,7 +80,24 @@ public class GameGrid implements Disposable {
      * as well as the layout on the grid.
      */
     public enum State {
-        IDLE, BUSY, GAME_OVER, VICTORY
+        /**
+         * Signifies a state in which the {@code GameGrid} is not doing anything,
+         * and neither are its {@link NumberBox}es.
+         */
+        IDLE,
+        /**
+         * Signifies a state in which the {@code GameGrid} is busy processing
+         * its {@link NumberBox}es' {@link pl.kaitou_dev.clone2048.game_entities.number_box.actions.BoxAction}s
+         */
+        BUSY,
+        /**
+         * Signifies a state in which the layout of the grid calls for a game over.
+         */
+        GAME_OVER,
+        /**
+         * Signifies a state in which the layout of the grid calls for a victory.
+         */
+        VICTORY
     }
 
     /**

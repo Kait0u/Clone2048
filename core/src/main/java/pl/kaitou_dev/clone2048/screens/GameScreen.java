@@ -11,20 +11,41 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
 
+/**
+ * Represents the actual game screen, and contains all the rendering logic.
+ */
 public class GameScreen implements Screen {
+    /**
+     * The {@link Game} instance, required for switching between the screens.
+     */
     private final Game game;
 
+    /**
+     * The {@link Camera} for graphics.
+     */
     private final OrthographicCamera camera;
+    /**
+     * The {@link com.badlogic.gdx.utils.viewport.Viewport} to make the window scale well while on this screen.
+     */
     private final FitViewport viewport;
 
+    /**
+     * The {@link SpriteBatch} to render everything onto.
+     */
     private final SpriteBatch spriteBatch;
 
 
     // Game objects
-
+    /**
+     * The {@link GameGrid} that a game of 2048 requires.
+     */
     private GameGrid gameGrid;
 
-
+    /**
+     * The default constructor, which takes a reference to the {@link Game} object
+     * and sets up the basic components to display the screen.
+     * @param game An instance of the current {@link Game} object.
+     */
     public GameScreen(Game game) {
         this.game = game;
 
@@ -58,26 +79,28 @@ public class GameScreen implements Screen {
         handleInput();
     }
 
+    /**
+     * Updates the children objects of this screen using the delta-time.
+     * After that, checks if the game can end, and with what result, and if it can - changes the screen appropriately.
+     * @param delta The delta-time.
+     */
     private void update(float delta) {
         gameGrid.update(delta);
 
-        switch (gameGrid.getState()) {
-            case GAME_OVER -> {
-                game.setScreen(new ResultsScreen(game, gameGrid, Constants.GameResult.GAME_OVER));
-                dispose();
-            }
-            case VICTORY -> {
-                game.setScreen(new ResultsScreen(game, gameGrid, Constants.GameResult.VICTORY));
-                dispose();
-            }
+        if (gameGrid.isGameOver()) {
+            game.setScreen(new ResultsScreen(game, gameGrid, Constants.GameResult.GAME_OVER));
+            dispose();
+
+        } else if (gameGrid.isVictory()) {
+            game.setScreen(new ResultsScreen(game, gameGrid, Constants.GameResult.VICTORY));
+            dispose();
         }
     }
 
+    /**
+     * Handles the input from the user.
+     */
     private void handleInput() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            gameGrid.addNewBox(1024);
-        }
-
         gameGrid.handleInput();
     }
 
@@ -88,19 +111,13 @@ public class GameScreen implements Screen {
     }
 
     @Override
-    public void pause() {
-
-    }
+    public void pause() {}
 
     @Override
-    public void resume() {
-
-    }
+    public void resume() {}
 
     @Override
-    public void hide() {
-
-    }
+    public void hide() {}
 
     @Override
     public void dispose() {
