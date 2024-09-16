@@ -10,10 +10,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.number_box.BoxColorPalette;
+import pl.kaitou_dev.clone2048.game_entities.number_box.BoxTexturePalette;
 import pl.kaitou_dev.clone2048.game_entities.number_box.NumberBox;
-import pl.kaitou_dev.clone2048.utils.ControlUtils;
-import pl.kaitou_dev.clone2048.utils.MathNumUtils;
-import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
+import pl.kaitou_dev.clone2048.utils.*;
 import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
 import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolators;
 
@@ -108,7 +107,7 @@ public class GameGrid implements Disposable {
     /**
      * A boolean flag dictating whether the {@link NumberBox}es in this grid should display their numbers or not.
      */
-    private boolean shouldShowNumbers = true;
+    private final boolean shouldShowNumbers;
 
 
     // Textures & Graphics
@@ -125,7 +124,12 @@ public class GameGrid implements Disposable {
     /**
      * The color palette to be used by all of this {@code GameGrid}'s {@link NumberBox}es.
      */
-    private final BoxColorPalette palette = BoxColorPalette.COLORFUL;
+    private final BoxColorPalette colorPalette = BoxColorPalette.COLORFUL;
+
+    /**
+     * The texture palette to be used by all of this {@code GameGrid}'s {@link NumberBox}es.
+     */
+    private final BoxTexturePalette texturePalette;
 
     // Geometry
 
@@ -140,9 +144,18 @@ public class GameGrid implements Disposable {
     private int posY;
 
     /**
-     * The default constructor.
+     * A constructor that enables the display of numbers by default.
      */
     public GameGrid() {
+        this(true);
+    }
+
+    /**
+     * A constructor that enables the caller to decide whether this {@code GameGrid}'s {@link NumberBox}es
+     * should display their numbers.
+     * @param showNumbers Whether the numbers should display (true) or not (false).
+     */
+    public GameGrid(boolean showNumbers) {
         grid = new NumberBox[GRID_SIDE][GRID_SIDE];
         boxesToRemove = new ArrayList<>();
         secretNumber = MathNumUtils.randInt(1, 11);
@@ -157,17 +170,16 @@ public class GameGrid implements Disposable {
         txGridSlot = new Texture(pmGridSlot);
         pmGridSlot.dispose();
 
-        addNewBox();
-    }
-
-    /**
-     * An alternate constructor that enables the caller to decide whether this {@code GameGrid}'s {@link NumberBox}es
-     * should display their numbers.
-     * @param showNumbers Whether the numbers should display (true) or not (false).
-     */
-    public GameGrid(boolean showNumbers) {
-        this();
         shouldShowNumbers = showNumbers;
+
+        texturePalette = new BoxTexturePalette(
+            colorPalette,
+            shouldShowNumbers
+                ? FontUtils.losevka(40)
+                : null,
+            Constants.MAX_VALUE);
+
+        addNewBox();
     }
 
     /**
@@ -231,7 +243,7 @@ public class GameGrid implements Disposable {
         Set<Integer> directionalKeys = ControlUtils.getDirectionKeys();
 
         for (Integer gdxKey : directionalKeys) {
-            if (Gdx.input.isKeyPressed(gdxKey)) {
+            if (Gdx.input.isKeyJustPressed(gdxKey)) {
                 move(ControlUtils.getDirection(gdxKey));
                 break;
             }
@@ -543,6 +555,8 @@ public class GameGrid implements Disposable {
         for (NumberBox box : boxesToRemove) {
             box.dispose();
         }
+
+        texturePalette.dispose();
     }
 
 
@@ -597,8 +611,16 @@ public class GameGrid implements Disposable {
      * Gets the color palette of this {@code GameGrid}.
      * @return The {@link BoxColorPalette} of this {@code GameGrid}.
      */
-    public BoxColorPalette getPalette() {
-        return palette;
+    public BoxColorPalette getColorPalette() {
+        return colorPalette;
+    }
+
+    /**
+     * Gets the texture palette of this {@code GameGrid}.
+     * @return The {@link BoxTexturePalette} of this {@code GameGrid}.
+     */
+    public BoxTexturePalette getTexturePalette() {
+        return texturePalette;
     }
 
     /**

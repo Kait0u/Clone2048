@@ -25,7 +25,7 @@ public class MathNumUtils {
      * @param n The number to test.
      * @return {@code true} if the number is a power of 2, {@code false} if it is not.
      */
-    public static boolean isPowerOfTwo(int n) {
+    public static boolean isPowerOfTwo(long n) {
         return (n & (n - 1)) == 0;
     }
 

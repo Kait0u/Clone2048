@@ -7,11 +7,11 @@ public class Constants {
     /**
      * The width of the resolution at which the game should be rendered.
      */
-    public static final int GAME_WIDTH = 800;
+    public static final int GAME_WIDTH = 1024;
     /**
      * The height of the resolution at which the game should be rendered.
      */
-    public static final int GAME_HEIGHT = 600;
+    public static final int GAME_HEIGHT = 768;
 
     /**
      * The max width of the window that displays the game.

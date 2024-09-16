@@ -1,19 +1,12 @@
 package pl.kaitou_dev.clone2048.game_entities.number_box;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
 import pl.kaitou_dev.clone2048.game_entities.number_box.actions.BoxAction;
 import pl.kaitou_dev.clone2048.game_entities.number_box.actions.BoxMoveAction;
-import pl.kaitou_dev.clone2048.utils.FontUtils;
 import pl.kaitou_dev.clone2048.utils.MathNumUtils;
-import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
 import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
 
 /**
@@ -29,7 +22,7 @@ public class NumberBox {
     /**
      * The {@link GameGrid} this {@code NumberBox} belongs to.
      */
-    private GameGrid grid;
+    private final GameGrid grid;
 
     /**
      * The X coordinate of this {@code NumberBox} on the screen.
@@ -51,22 +44,9 @@ public class NumberBox {
     private Texture texture;
 
     /**
-     * The color palette of this {@code NumberBox}
+     * The texture palette of this {@code NumberBox}
      */
-    private final BoxColorPalette colorPalette;
-    /**
-     * The background color of this {@code NumberBox}. Its fallback value is sky blue.
-     */
-    private Color bgColor = Color.SKY;
-    /**
-     * The font color of this {@code NumberBox}. Its fallback value is black.
-     */
-    private Color fontColor = Color.BLACK;
-
-    /**
-     * The font this {@code NumberBox} is going to use to draw its value.
-     */
-    private BitmapFont font;
+    private final BoxTexturePalette texturePalette;
 
     /**
      * The parameter for scaling this {@code NumberBox}'s size.
@@ -86,13 +66,9 @@ public class NumberBox {
         this.value = value;
         this.grid = grid;
 
-        colorPalette = this.grid.getPalette();
-        updateColors(false);
+        texturePalette = this.grid.getTexturePalette();
 
-        texture = new Texture(GraphicsUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, bgColor));
-
-        font = FontUtils.losevka(40);
-        updateFontColor();
+        texture = texturePalette.getTexture(value);
     }
 
     /**
@@ -101,18 +77,6 @@ public class NumberBox {
      */
     public void draw(SpriteBatch batch) {
         batch.draw(texture, posX, posY, (float) (texture.getWidth() * scale), (float) (texture.getHeight() * scale));
-        if (grid.isShouldShowNumbers())
-            drawText(batch);
-    }
-
-    /**
-     * Draws this {@code NumberBox}'s text onto the specified {@link SpriteBatch}.
-     * @param batch The {@code SpriteBatch} onto which to draw.
-     */
-    private void drawText(SpriteBatch batch) {
-        int x = posX + Constants.SLOT_SIZE / 2;
-        int y = posY + Constants.SLOT_SIZE / 2;
-        GraphicsUtils.drawCenteredTextLine(batch, String.valueOf(value), font, x, y);
     }
 
     /**
@@ -120,7 +84,7 @@ public class NumberBox {
      */
     public void upgrade() {
         value <<= 1;
-        updateColors(true);
+        updateTexture();
     }
 
     /**
@@ -141,9 +105,8 @@ public class NumberBox {
     @Override
     public boolean equals(Object other) {
         if (other == null) return false;
-        if (!(other instanceof NumberBox)) return false;
+        if (!(other instanceof NumberBox otherBox)) return false;
 
-        NumberBox otherBox = (NumberBox) other;
         return value == otherBox.value;
     }
 
@@ -239,41 +202,17 @@ public class NumberBox {
     }
 
     /**
-     * Updates the color fields of this {@code NumberBox}.
-     * @param cascade If this should also update the {@link Texture} and {@link BitmapFont}'s colors.
-     */
-    private void updateColors(boolean cascade) {
-        if (colorPalette != null) {
-            bgColor = colorPalette.getColor(value);
-            fontColor = colorPalette.getFontColor(bgColor);
-
-            if (cascade) {
-                updateTexture();
-                updateFontColor();
-            }
-        }
-    }
-
-    /**
-     * Disposes of the current {@link Texture} and generates a new one.
+     * Gets a new {@link Texture} from its {@link GameGrid}'s {@link BoxTexturePalette}.
      */
     private void updateTexture() {
-        if (texture != null) texture.dispose();
-        texture = new Texture(GraphicsUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, bgColor));
+        texture = texturePalette.getTexture(value);
     }
 
-    /**
-     * Updates the {@link BitmapFont}'s font color.
-     */
-    private void updateFontColor() {
-        font.setColor(fontColor);
-    }
 
     /**
      * Disposes of unneeded resources.
      */
     public void dispose() {
-        if (texture != null) texture.dispose();
-        if (font != null) font.dispose();
+
     }
 }

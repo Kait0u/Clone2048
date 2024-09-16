@@ -1,4 +1,4 @@
-package pl.kaitou_dev.clone2048.game_entities;
+package pl.kaitou_dev.clone2048.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;

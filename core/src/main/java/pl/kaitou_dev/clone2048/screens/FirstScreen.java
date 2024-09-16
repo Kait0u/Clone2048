@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import pl.kaitou_dev.clone2048.Constants;
-import pl.kaitou_dev.clone2048.game_entities.Directions;
+import pl.kaitou_dev.clone2048.utils.Directions;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
 import pl.kaitou_dev.clone2048.utils.FontUtils;
 import pl.kaitou_dev.clone2048.utils.GraphicsUtils;

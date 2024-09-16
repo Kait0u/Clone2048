@@ -9,7 +9,7 @@ import java.util.Map;
  * Contains multiple colors and a functionality to get different colors, and matching font-colors.
  * It connects a binary power with a specific color.
  */
-public class BoxColorPalette {
+public class BoxColorPalette extends BinaryPalette<Color> {
     /**
      * The standard, colorful color palette.
      */
@@ -54,7 +54,9 @@ public class BoxColorPalette {
      * The default constructor.
      */
     private BoxColorPalette() {
-        colors = new HashMap<>();
+        super();
+
+        colors = super.items;
         fontColors = new HashMap<>();
     }
 
@@ -73,8 +75,7 @@ public class BoxColorPalette {
      * @param color The color to be added.
      */
     protected void addColor(Color color) {
-        colors.put(nextBinaryPower, color);
-        nextBinaryPower <<= 1;
+        addItem(color);
 
         float r = color.r;
         float g = color.g;
@@ -98,10 +99,11 @@ public class BoxColorPalette {
     /**
      * Gets a color based on a binary power provided.
      * @param binaryPower The binary power, the color corresponding to which to get.
-     * @return A {@link Color} corresponding to the provided binary power.
+     * @return A {@link Color} corresponding to the provided binary power or {@code null} if the binary power
+     *         has no {@code Color} associated with it.
      */
     public Color getColor(long binaryPower) {
-        return colors.get(binaryPower);
+        return getItem(binaryPower);
     }
 
     /**

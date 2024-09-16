@@ -2,7 +2,6 @@ package pl.kaitou_dev.clone2048.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import pl.kaitou_dev.clone2048.game_entities.Directions;
 
 import java.util.HashMap;
 import java.util.Map;
