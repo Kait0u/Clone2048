@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
+import pl.kaitou_dev.clone2048.utils.AudioUtils;
 import pl.kaitou_dev.clone2048.utils.FontUtils;
 import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
 import pl.kaitou_dev.clone2048.utils.timed_actions.Blinker;
@@ -50,9 +51,9 @@ public class ResultsScreen implements Screen {
     private final BitmapFont fontText;
 
     /**
-     * The text to be displayed as the heading.
+     * The result of the game.
      */
-    private final String headingText;
+    private final Constants.GameResult gameResult;
 
     /**
      * The sprite that represents the final situation on the {@link GameGrid}.
@@ -76,7 +77,7 @@ public class ResultsScreen implements Screen {
         batch = new SpriteBatch();
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        headingText = gameResult.getResultHeading();
+        this.gameResult = gameResult;
 
         fontHeading = FontUtils.monofett(120 * Constants.UNIT_FONT_SIZE);
         fontHeading.setColor(Color.BLACK);
@@ -92,6 +93,11 @@ public class ResultsScreen implements Screen {
     @Override
     public void show() {
         blinker.start();
+
+        switch (gameResult) {
+            case VICTORY -> AudioUtils.Sounds.GAME_WIN.play();
+            case GAME_OVER -> AudioUtils.Sounds.GAME_OVER.play();
+        }
     }
 
     /**
@@ -112,7 +118,11 @@ public class ResultsScreen implements Screen {
         batch.begin();
 
         GraphicsUtils.drawCenteredTextLine(
-            batch, headingText, fontHeading, Constants.GAME_WIDTH / 2, (int) (Constants.GAME_HEIGHT - fontHeading.getCapHeight())
+            batch,
+            gameResult.getResultHeading(),
+            fontHeading,
+            Constants.GAME_WIDTH / 2,
+            (int) (Constants.GAME_HEIGHT - fontHeading.getCapHeight())
         );
 
         if (blinker.isOn())

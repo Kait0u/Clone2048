@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
  */
 public class FontUtils {
     /**
-     * Gets a font from the "fonts" directory, given by its filename,
+     * Gets a font from the "fonts" directory, given its filename,
      * turning it into a {@link BitmapFont} of provided size.
      * @param filename The filename of the font file.
      *                 WARNING: it is NOT a path, it is the name of the file in the assets/fonts directory

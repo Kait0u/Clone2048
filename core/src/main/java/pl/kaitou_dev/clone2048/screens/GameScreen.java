@@ -1,8 +1,6 @@
 package pl.kaitou_dev.clone2048.screens;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,6 +8,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
+import pl.kaitou_dev.clone2048.utils.AudioUtils;
 
 /**
  * Represents the actual game screen, and contains all the rendering logic.
@@ -61,7 +60,12 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         gameGrid = new GameGrid();
-        gameGrid.setCoords(Constants.GAME_WIDTH / 2 - GameGrid.SIZE / 2, Constants.GAME_HEIGHT / 2 - GameGrid.SIZE / 2);
+        gameGrid.setCoords(
+            Constants.GAME_WIDTH / 2 - GameGrid.SIZE / 2,
+            Constants.GAME_HEIGHT / 2 - GameGrid.SIZE / 2
+        );
+
+        AudioUtils.Sounds.GAME_START.play();
     }
 
     @Override
