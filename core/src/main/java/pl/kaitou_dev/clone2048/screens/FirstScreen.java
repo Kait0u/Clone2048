@@ -96,11 +96,11 @@ public class FirstScreen implements Screen {
             Pixmap.Format.RGBA8888, Constants.GAME_WIDTH, Constants.GAME_HEIGHT, true
         );
 
-        fontLogo = FontUtils.monofett(120);
+        fontLogo = FontUtils.monofett(120 * Constants.UNIT_FONT_SIZE);
         fontLogo.setColor(Color.BLACK);
-        fontText = FontUtils.losevka(30);
+        fontText = FontUtils.losevka(30 * Constants.UNIT_FONT_SIZE);
         fontText.setColor(Color.BLACK);
-        fontCredits = FontUtils.losevka(15);
+        fontCredits = FontUtils.losevka(15 * Constants.UNIT_FONT_SIZE);
         fontCredits.setColor(Color.BLACK);
 
 

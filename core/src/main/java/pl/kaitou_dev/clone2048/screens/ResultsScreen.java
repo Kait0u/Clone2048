@@ -78,9 +78,9 @@ public class ResultsScreen implements Screen {
 
         headingText = gameResult.getResultHeading();
 
-        fontHeading = FontUtils.monofett(120);
+        fontHeading = FontUtils.monofett(120 * Constants.UNIT_FONT_SIZE);
         fontHeading.setColor(Color.BLACK);
-        fontText = FontUtils.losevka(30);
+        fontText = FontUtils.losevka(30 * Constants.UNIT_FONT_SIZE);
         fontText.setColor(Color.BLACK);
 
         gridSprite = getGridSprite(grid);

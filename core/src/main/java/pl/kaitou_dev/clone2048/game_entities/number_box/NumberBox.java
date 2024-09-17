@@ -3,6 +3,7 @@ package pl.kaitou_dev.clone2048.game_entities.number_box;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
 import pl.kaitou_dev.clone2048.game_entities.number_box.actions.BoxAction;
 import pl.kaitou_dev.clone2048.game_entities.number_box.actions.BoxMoveAction;
@@ -52,6 +53,11 @@ public class NumberBox {
      * The parameter for scaling this {@code NumberBox}'s size.
      */
     private double scale = 1.0;
+
+    /**
+     * The recommended font size for the {@code NumberBox}es.
+     */
+    public static final int FONT_SIZE = Constants.SLOT_SIZE * 40 / 100;
 
     /**
      * The constructor which takes the parent {@link GameGrid}

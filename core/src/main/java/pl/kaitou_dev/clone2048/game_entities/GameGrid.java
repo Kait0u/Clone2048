@@ -36,12 +36,12 @@ public class GameGrid implements Disposable {
     /**
      * The padding of the grid, in pixels.
      */
-    private static final int GRID_PADDING = 20;
+    private static final int GRID_PADDING = (int) (Constants.GAME_HEIGHT * 333.0 / 10000.0);
 
     /**
      * The space between every two neighboring boxes, in pixels.
      */
-    private static final int SLOT_SPACING = 10;
+    private static final int SLOT_SPACING = GRID_PADDING / 2;
 
     /**
      * The length of one side of the grid, in pixels.
@@ -175,7 +175,7 @@ public class GameGrid implements Disposable {
         texturePalette = new BoxTexturePalette(
             colorPalette,
             shouldShowNumbers
-                ? FontUtils.losevka(40)
+                ? FontUtils.losevka(NumberBox.FONT_SIZE)
                 : null,
             Constants.MAX_VALUE);
 
@@ -564,6 +564,7 @@ public class GameGrid implements Disposable {
      * Gets a String-representation of the current state of this {@code GameGrid}.
      * @return A multi-line String representing the current state of this {@code GameGrid}.
      */
+    @Override
     public String toString() {
         String nullString = "[    ]";
         StringBuilder sb = new StringBuilder();

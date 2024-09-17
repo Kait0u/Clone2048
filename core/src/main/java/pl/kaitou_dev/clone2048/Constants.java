@@ -30,7 +30,7 @@ public class Constants {
     /**
      * The length of a side of a single slot, in pixels.
      */
-    public static final int SLOT_SIZE = 100;
+    public static final int SLOT_SIZE = GAME_HEIGHT / 6;
 
     /**
      * The basic movement speed, in seconds.
@@ -47,6 +47,11 @@ public class Constants {
      * The default duration of a blink, in seconds.
      */
     public static final double DEFAULT_BLINK = 0.75;
+
+    /**
+     * The unit font size - to be multiplied by some coefficients to achieve
+     */
+    public static final int UNIT_FONT_SIZE = GAME_HEIGHT / 600;
 
     /**
      * An enum containing various states the game can find itself in WHEN FINISHED,
