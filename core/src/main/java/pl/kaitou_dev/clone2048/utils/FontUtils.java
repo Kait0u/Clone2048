@@ -19,7 +19,7 @@ public class FontUtils {
      * @return The TTF font as a {@code BitmapFont}
      */
     private static BitmapFont getFont(String filename, int size) {
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(filename));
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/" + filename));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = size;
 
@@ -38,7 +38,7 @@ public class FontUtils {
      * @return The "losevka" font as a {@link BitmapFont}
      */
     public static BitmapFont losevka(int size) {
-        return getFont("fonts/losevka.ttf", size);
+        return getFont("losevka.ttf", size);
     }
 
     /**
@@ -47,6 +47,6 @@ public class FontUtils {
      * @return The "monofett" font as a {@link BitmapFont}
      */
     public static BitmapFont monofett(int size) {
-        return getFont("fonts/Monofett-Regular.ttf", size);
+        return getFont("Monofett-Regular.ttf", size);
     }
 }
