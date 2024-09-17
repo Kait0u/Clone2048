@@ -58,6 +58,9 @@ public class AudioUtils {
         public static Sound MOVE = getSound("move.ogg");
     }
 
+    /**
+     * Disposes of the sound files - should be called at the end of application's lifecycle.
+     */
     public static void dispose() {
         Arrays.stream(Sounds.class.getFields())
             .filter(field -> field.getType().equals(Sound.class))

@@ -17,6 +17,7 @@ import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
 import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolators;
 
 import java.util.*;
+import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -62,6 +63,11 @@ public class GameGrid implements Disposable {
      * A list of boxes that will be removed as soon as events related to them have been handled.
      */
     private final ArrayList<NumberBox> boxesToRemove;
+
+    /**
+     * A list of boxes that will be upgraded as soon as events related to them have been handled.
+     */
+    private final ArrayList<NumberBox> boxesToUpgrade;
 
     /**
      * A secret number that will allow for dice tests.
@@ -144,6 +150,13 @@ public class GameGrid implements Disposable {
     private int posY;
 
     /**
+     * Informs whether the sound will be played ({@code true}) or not ({@code false}).
+     * The sound is on by default.
+     */
+    private boolean isSoundOn = true;
+
+
+    /**
      * A constructor that enables the display of numbers by default.
      */
     public GameGrid() {
@@ -158,9 +171,13 @@ public class GameGrid implements Disposable {
     public GameGrid(boolean showNumbers) {
         grid = new NumberBox[GRID_SIDE][GRID_SIDE];
         boxesToRemove = new ArrayList<>();
+        boxesToUpgrade = new ArrayList<>();
         secretNumber = MathNumUtils.randInt(1, 11);
-        movementPossibilities = Collections.synchronizedMap(new HashMap<>());
-        updateLegalMoves();
+        movementPossibilities = Collections.synchronizedMap(new HashMap<>(){{
+            for (Directions direction : Directions.values()) {
+                put(direction, true);
+            }
+        }});
 
         Pixmap pmGridBackground = GraphicsUtils.getRoundRectPixmap(SIZE, SIZE, SIZE * 5 / 100, Color.DARK_GRAY);
         txGridBackground = new Texture(pmGridBackground);
@@ -180,6 +197,7 @@ public class GameGrid implements Disposable {
             Constants.MAX_VALUE);
 
         addNewBox();
+        updateLegalMoves();
     }
 
     /**
@@ -187,6 +205,7 @@ public class GameGrid implements Disposable {
      * @param delta Delta-time at the moment of calling.
      */
     public void update(float delta) {
+        State initialState = state;
         state = State.IDLE;
 
         for (NumberBox[] row : grid) {
@@ -209,7 +228,23 @@ public class GameGrid implements Disposable {
                 itBoxesToRemove.remove();
                 box.dispose();
             }
+        }
 
+        boolean mergesDone = false;
+        // For boxes to upgrade
+        if (state.equals(State.IDLE) && !boxesToUpgrade.isEmpty()) {
+            boxesToUpgrade.parallelStream().forEach(NumberBox::upgrade);
+            boxesToUpgrade.clear();
+            mergesDone = true;
+            updateLegalMoves();
+        }
+
+        // Play a proper sound.
+        if (isSoundOn) {
+            if (initialState.equals(State.BUSY) && state.equals(State.IDLE)) {
+                if (mergesDone) AudioUtils.Sounds.MERGE.play();
+                else AudioUtils.Sounds.MOVE.play();
+            }
         }
 
         // Check if game should end
@@ -311,8 +346,8 @@ public class GameGrid implements Disposable {
                     NumberBox otherBox = isVertical ? grid[newIdx][secondaryIdx] : grid[secondaryIdx][newIdx];
 
                     if (otherBox != null) {
-                        if (otherBox.equals(consideredBox)) {
-                            otherBox.upgrade();
+                        if (otherBox.equals(consideredBox) && !boxesToUpgrade.contains(otherBox)) {
+                            boxesToUpgrade.add(otherBox);
                             boxesToRemove.add(consideredBox);
                         } else {
                             newIdx -= distMultiplier;
@@ -356,26 +391,37 @@ public class GameGrid implements Disposable {
     /**
      * Evaluates whether a movement in the provided direction is possible or not.
      * @param direction The direction whose movement's possibility is to be evaluated.
-     * @return {@code true} if such movement in the direction is possible, {@code false} if not.
+     * @return {@code true} if movement in the direction is possible, {@code false} if not.
      */
     public boolean isMovementPossible(Directions direction) {
-        IntPredicate boundaryPredicate = switch(direction) {
-            case UP, LEFT -> (v -> v < GRID_SIDE - 1);
-            case DOWN, RIGHT -> (v -> v > 0);
+        IntPredicate finalBoundaryPredicate = switch(direction) {
+            case DOWN, RIGHT -> (v -> v == GRID_SIDE - 1);
+            case UP, LEFT -> (v -> v == 0);
         };
 
-        return IntStream.range(0, GRID_SIDE).parallel().anyMatch(r ->
+        return IntStream.range(0, GRID_SIDE).anyMatch(r ->
             IntStream.range(0, GRID_SIDE).anyMatch(c -> {
+                int boundaryTestVal = direction.isVertical() ? r : c;
+                boolean boundaryAchieved = finalBoundaryPredicate.test(boundaryTestVal);
+
                 NumberBox consideredBox = grid[r][c];
+
+                // Skip if the current box is empty
+                if (consideredBox == null) {
+                    return false;
+                }
+
+                // Get the neighbor in the specified direction
                 NumberBox neighbor = getNeighbor(r, c, direction);
 
-                int boundaryTestVal = direction.isVertical() ? r : c;
-
-                if (consideredBox == null) {
-                    return boundaryPredicate.test(boundaryTestVal);
-                } else {
-                    return consideredBox.equals(neighbor);
+                // Check if movement is possible:
+                // 1. The neighbor exists and is empty
+                // 2. The neighbor exists and has the same value (merge possible)
+                if (!boundaryAchieved && (neighbor == null || neighbor.equals(consideredBox))) {
+                    return true;
                 }
+
+                return false;
             })
         );
     }
@@ -389,8 +435,8 @@ public class GameGrid implements Disposable {
      */
     public NumberBox getNeighbor(int row, int col, Directions side) {
         return switch(side) {
-            case DOWN -> indexWithinBounds(row - 1) ? grid[row - 1][col] : null;
-            case UP -> indexWithinBounds(row + 1) ? grid[row + 1][col] : null;
+            case UP -> indexWithinBounds(row - 1) ? grid[row - 1][col] : null;
+            case DOWN -> indexWithinBounds(row + 1) ? grid[row + 1][col] : null;
             case LEFT -> indexWithinBounds(col - 1) ? grid[row][col - 1] : null;
             case RIGHT -> indexWithinBounds(col + 1) ? grid[row][col + 1] : null;
         };
@@ -674,5 +720,13 @@ public class GameGrid implements Disposable {
      */
     public boolean isShouldShowNumbers() {
         return shouldShowNumbers;
+    }
+
+    /**
+     * Sets the on/off status of sound played by this {@code GameGrid}.
+     * @param isOn {@code true} if sounds should play, {@code false} if they should not.
+     */
+    public void setSoundOn(boolean isOn) {
+        isSoundOn = isOn;
     }
 }

@@ -103,9 +103,9 @@ public class FirstScreen implements Screen {
         fontCredits = FontUtils.losevka(15 * Constants.UNIT_FONT_SIZE);
         fontCredits.setColor(Color.BLACK);
 
-
         grid = new GameGrid(false);
         grid.setCoords(Constants.GAME_WIDTH / 2 - GameGrid.SIZE / 2, Constants.GAME_HEIGHT / 2 - GameGrid.SIZE / 2);
+        grid.setSoundOn(false);
 
         blinker = new Blinker(Constants.DEFAULT_BLINK, Constants.DEFAULT_BLINK, true);
     }
