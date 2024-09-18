@@ -68,7 +68,6 @@ public class SequentialAction extends Action {
 
         if (currentAction != null) {
             currentAction.actWithDelta(delta);
-
             if (currentAction.isDone()) {
                 actionsDone.add(currentAction);
                 currentAction = null;

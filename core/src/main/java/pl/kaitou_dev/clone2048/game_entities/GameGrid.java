@@ -12,12 +12,13 @@ import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.number_box.BoxColorPalette;
 import pl.kaitou_dev.clone2048.game_entities.number_box.BoxTexturePalette;
 import pl.kaitou_dev.clone2048.game_entities.number_box.NumberBox;
+import pl.kaitou_dev.clone2048.game_entities.number_box.actions.BoxScaleAction;
 import pl.kaitou_dev.clone2048.utils.*;
+import pl.kaitou_dev.clone2048.utils.timed_actions.SequentialAction;
 import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
 import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolators;
 
 import java.util.*;
-import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -183,7 +184,11 @@ public class GameGrid implements Disposable {
         txGridBackground = new Texture(pmGridBackground);
         pmGridBackground.dispose();
 
-        Pixmap pmGridSlot = GraphicsUtils.getRoundRectPixmap(Constants.SLOT_SIZE, Constants.SLOT_SIZE, Constants.SLOT_SIZE * 20 / 100, Color.LIGHT_GRAY);
+        Pixmap pmGridSlot = GraphicsUtils.getRoundRectPixmap(
+            Constants.SLOT_SIZE,
+            Constants.SLOT_SIZE,
+            Constants.SLOT_SIZE * 20 / 100, Color.LIGHT_GRAY
+        );
         txGridSlot = new Texture(pmGridSlot);
         pmGridSlot.dispose();
 
@@ -305,7 +310,8 @@ public class GameGrid implements Disposable {
 
         if (movementPossibilities.get(direction)) {
             handleMovement(direction);
-            addNewBox();
+            NumberBox newBox = addNewBox();
+
             updateLegalMoves();
             state = State.BUSY;
         }
@@ -331,7 +337,7 @@ public class GameGrid implements Disposable {
         primaryStream = primaryStream.skip(1);
 
         primaryStream.forEach(primaryIdx -> {
-            IntStream secondaryStream = IntStream.range(0, GRID_SIDE);
+            IntStream secondaryStream = IntStream.range(0, GRID_SIDE).parallel();
             secondaryStream.forEach(secondaryIdx -> {
                 NumberBox consideredBox = isVertical ? grid[primaryIdx][secondaryIdx] : grid[secondaryIdx][primaryIdx];
                 if (consideredBox == null) return;
@@ -365,7 +371,7 @@ public class GameGrid implements Disposable {
                     ? getSlotCoords(newIdx, secondaryIdx)
                     : getSlotCoords(secondaryIdx, newIdx);
 
-                consideredBox.move((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
+                consideredBox.actMove((int) coords.x, (int) coords.y, Constants.BASIC_MOVEMENT_SPEED, DEFAULT_INTERPOLATOR);
             });
         });
     }
@@ -478,17 +484,20 @@ public class GameGrid implements Disposable {
     /**
      * Adds a new {@link NumberBox} to this {@code GameGrid}.
      * There is 90% chance that the box will have the value of 2, and 10% chance that it will have the value of 4.
+     *
+     * @return The {@code NumberBox} created, or {@code null} if nothing happened.
      */
-    public void addNewBox() {
+    public NumberBox addNewBox() {
         int value = MathNumUtils.diceTest(10, secretNumber) ? 4 : 2;
-        addNewBox(value);
+        return addNewBox(value);
     }
 
     /**
      * Adds a new {@link NumberBox} of the specified value.
      * @param value The value for the box to have. (Must be a power of 2!)
+     * @return The {@code NumberBox} created, or {@code null} if nothing happened.
      */
-    public void addNewBox(int value) {
+    public NumberBox addNewBox(int value) {
         Vector2 indices = randomEmptyIndices();
 
         if (indices != null) {
@@ -500,8 +509,19 @@ public class GameGrid implements Disposable {
 
             Vector2 boxCoords = getSlotCoords(r, c);
             newBox.setCoords((int) boxCoords.x, (int) boxCoords.y);
+
+            newBox.setScale(0);
+            newBox.setAction(
+                new SequentialAction(
+                    new BoxScaleAction(newBox, 1.2, Constants.BASIC_MOVEMENT_SPEED * 2 / 3, DEFAULT_INTERPOLATOR),
+                    new BoxScaleAction(newBox, 1.0, Constants.BASIC_MOVEMENT_SPEED / 3, DEFAULT_INTERPOLATOR)
+                )
+            );
+
+            return newBox;
         }
 
+        return null;
     }
 
     /**

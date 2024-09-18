@@ -10,11 +10,11 @@ public class BoxMoveAction extends BoxAction {
     /**
      * The X coordinate of the starting point.
      */
-    private final int startX;
+    private int startX;
     /**
      * The Y coordinate of the starting point.
      */
-    private final int startY;
+    private int startY;
 
     /**
      * The X coordinate of the destination point.
@@ -57,6 +57,11 @@ public class BoxMoveAction extends BoxAction {
 
     @Override
     public void actWithDelta(float delta) {
+        if (elapsedSeconds == 0) {
+            startX = box.getPosX();
+            startY = box.getPosY();
+        }
+
         elapsedSeconds += delta;
 
         if (elapsedSeconds >= durationSeconds) {
