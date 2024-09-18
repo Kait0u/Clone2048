@@ -263,7 +263,7 @@ public class GameGrid implements Disposable {
     private void handleVictoryLoss() {
         if (state == State.IDLE) {
             // Check for victory.
-            boolean got2048 = isValueOnBoard(2048);
+            boolean got2048 = isValueOnBoard(Constants.MAX_VALUE);
             if (got2048) {
                 state = State.VICTORY;
                 return;
@@ -405,8 +405,8 @@ public class GameGrid implements Disposable {
             case UP, LEFT -> (v -> v == 0);
         };
 
-        return IntStream.range(0, GRID_SIDE).anyMatch(r ->
-            IntStream.range(0, GRID_SIDE).anyMatch(c -> {
+        return IntStream.range(0, GRID_SIDE).parallel().anyMatch(r ->
+            IntStream.range(0, GRID_SIDE).parallel().anyMatch(c -> {
                 int boundaryTestVal = direction.isVertical() ? r : c;
                 boolean boundaryAchieved = finalBoundaryPredicate.test(boundaryTestVal);
 

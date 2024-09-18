@@ -166,8 +166,8 @@ public class FirstScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        int w = gridTexture.getWidth() / 2;
-        int h = gridTexture.getHeight() / 2;
+        int w = gridTexture.getWidth() * 2 / 3;
+        int h = gridTexture.getHeight() * 2 / 3;
 
         batch.draw(gridTexture, Constants.GAME_WIDTH / 2 - w / 2, Constants.GAME_HEIGHT / 2 - h / 2, w, h);
 

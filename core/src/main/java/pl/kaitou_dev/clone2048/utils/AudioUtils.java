@@ -39,23 +39,23 @@ public class AudioUtils {
         /**
          * The game over sound.
          */
-        public static Sound GAME_OVER = getSound("gameOver.ogg");
+        public static final Sound GAME_OVER = getSound("gameOver.ogg");
         /**
          * The victory sound.
          */
-        public static Sound GAME_WIN = getSound("gameWin.ogg");
+        public static final Sound GAME_WIN = getSound("gameWin.ogg");
         /**
          * The game start sound.
          */
-        public static Sound GAME_START = getSound("gameStart.ogg");
+        public static final Sound GAME_START = getSound("gameStart.ogg");
         /**
          * The merge sound.
          */
-        public static Sound MERGE = getSound("merge.ogg");
+        public static final Sound MERGE = getSound("merge.ogg");
         /**
          * The move sound.
          */
-        public static Sound MOVE = getSound("move.ogg");
+        public static final Sound MOVE = getSound("move.ogg");
     }
 
     /**

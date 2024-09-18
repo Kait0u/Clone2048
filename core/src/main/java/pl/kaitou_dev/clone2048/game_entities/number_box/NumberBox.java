@@ -279,7 +279,7 @@ public class NumberBox {
 
     /**
      * Gets this {@code NumberBox}'s scale.
-     * @return
+     * @return This {@code NumberBox}'s scale.
      */
     public double getScale() {
         return scale;
