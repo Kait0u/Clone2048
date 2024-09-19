@@ -3,6 +3,7 @@ package pl.kaitou_dev.clone2048.utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import pl.kaitou_dev.clone2048.Clone2048;
 
 import java.util.Arrays;
 
@@ -69,8 +70,7 @@ public class AudioUtils {
                     Sound s = (Sound) field.get(null);
                     s.dispose();
                 } catch (IllegalAccessException e) {
-                    // TODO: Handle this properly.
-                    throw new RuntimeException(e);
+                    Clone2048.getInstance().handleError(e);
                 }
             });
     }

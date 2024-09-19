@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import pl.kaitou_dev.clone2048.Clone2048;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.utils.Directions;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
@@ -78,12 +79,10 @@ public class FirstScreen implements Screen {
     private final Blinker blinker;
 
     /**
-     * The default constructor, which takes a reference to the {@link Game} object
-     * and sets up the basic components to display the screen.
-     * @param game An instance of the current {@link Game} object.
+     * The default constructor which sets up the basic components to display the screen.
      */
-    public FirstScreen(Game game) {
-        this.game = game;
+    public FirstScreen() {
+        this.game = Clone2048.getInstance();
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
@@ -103,11 +102,18 @@ public class FirstScreen implements Screen {
         fontCredits = FontUtils.losevka(15 * Constants.UNIT_FONT_SIZE);
         fontCredits.setColor(Color.BLACK);
 
+        createGrid();
+
+        blinker = new Blinker(Constants.DEFAULT_BLINK, Constants.DEFAULT_BLINK, true);
+    }
+
+    /**
+     * Creates a {@link GameGrid} for the animation purposes.
+     */
+    private void createGrid() {
         grid = new GameGrid(false);
         grid.setCoords(Constants.GAME_WIDTH / 2 - GameGrid.SIZE / 2, Constants.GAME_HEIGHT / 2 - GameGrid.SIZE / 2);
         grid.setSoundOn(false);
-
-        blinker = new Blinker(Constants.DEFAULT_BLINK, Constants.DEFAULT_BLINK, true);
     }
 
     @Override
@@ -128,8 +134,7 @@ public class FirstScreen implements Screen {
 
         if (grid.isVictory() || grid.isGameOver()) {
             grid.dispose();
-            grid = new GameGrid(false);
-            grid.setCoords(Constants.GAME_WIDTH / 2 - GameGrid.SIZE / 2, Constants.GAME_HEIGHT / 2 - GameGrid.SIZE / 2);
+            createGrid();
         }
 
         animateGrid();
@@ -216,7 +221,7 @@ public class FirstScreen implements Screen {
      */
     private void handleInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            game.setScreen(new GameScreen(game));
+            game.setScreen(new GameScreen());
             dispose();
         }
     }

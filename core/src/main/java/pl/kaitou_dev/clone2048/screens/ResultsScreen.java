@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import pl.kaitou_dev.clone2048.Clone2048;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
 import pl.kaitou_dev.clone2048.utils.AudioUtils;
@@ -61,15 +62,14 @@ public class ResultsScreen implements Screen {
     private final Sprite gridSprite;
 
     /**
-     * The default constructor, which prepares the screen by accepting a reference to the {@link Game},
-     * as well as prepares the results view by accepting the {@link GameGrid} of the last game,
+     * The default constructor, which prepares the screen
+     * by creating a results view by accepting the {@link GameGrid} of the last game,
      * and the result of the game.
-     * @param game An instance of the current {@link Game} object.
      * @param grid The {@code GameGrid} from the previous screen.
      * @param gameResult The result coming from the previous screen.
      */
-    public ResultsScreen(Game game, GameGrid grid, Constants.GameResult gameResult) {
-        this.game = game;
+    public ResultsScreen(GameGrid grid, Constants.GameResult gameResult) {
+        this.game = Clone2048.getInstance();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         viewport = new FitViewport(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, camera);
@@ -144,7 +144,7 @@ public class ResultsScreen implements Screen {
      */
     private void handleInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            game.setScreen(new FirstScreen(game));
+            game.setScreen(new FirstScreen());
             dispose();
         }
     }

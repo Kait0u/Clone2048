@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import pl.kaitou_dev.clone2048.Clone2048;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
 import pl.kaitou_dev.clone2048.utils.AudioUtils;
@@ -41,12 +42,10 @@ public class GameScreen implements Screen {
     private GameGrid gameGrid;
 
     /**
-     * The default constructor, which takes a reference to the {@link Game} object
-     * and sets up the basic components to display the screen.
-     * @param game An instance of the current {@link Game} object.
+     * The default constructor which and sets up the basic components to display the screen.
      */
-    public GameScreen(Game game) {
-        this.game = game;
+    public GameScreen() {
+        this.game = Clone2048.getInstance();
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
@@ -92,11 +91,11 @@ public class GameScreen implements Screen {
         gameGrid.update(delta);
 
         if (gameGrid.isGameOver()) {
-            game.setScreen(new ResultsScreen(game, gameGrid, Constants.GameResult.GAME_OVER));
+            game.setScreen(new ResultsScreen(gameGrid, Constants.GameResult.GAME_OVER));
             dispose();
 
         } else if (gameGrid.isVictory()) {
-            game.setScreen(new ResultsScreen(game, gameGrid, Constants.GameResult.VICTORY));
+            game.setScreen(new ResultsScreen(gameGrid, Constants.GameResult.VICTORY));
             dispose();
         }
     }

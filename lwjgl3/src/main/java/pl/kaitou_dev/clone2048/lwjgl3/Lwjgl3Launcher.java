@@ -1,22 +1,42 @@
 package pl.kaitou_dev.clone2048.lwjgl3;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import pl.kaitou_dev.clone2048.Clone2048;
 import pl.kaitou_dev.clone2048.Constants;
+import pl.kaitou_dev.clone2048.utils.platform_specific.ErrorDisplayer;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
-    private static final int GAME_DESKTOP_WIDTH = 800, GAME_DESKTOP_HEIGHT = 600;
+    /**
+     * The default width of the desktop window, in pixels.
+     */
+    private static final int GAME_DESKTOP_WIDTH = Constants.GAME_WIDTH;
+    /**
+     * The default height of the desktop window, in pixels.
+     */
+    private static final int GAME_DESKTOP_HEIGHT = Constants.GAME_HEIGHT;
 
+    private static final Lwjgl3ErrorDisplayer ERROR_DISPLAYER = new Lwjgl3ErrorDisplayer();
 
+    /**
+     * The entry point to the desktop wrapper for the game.
+     * @param args Launch arguments.
+     */
     public static void main(String[] args) {
         if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.
         createApplication();
     }
 
+    /**
+     * Creates the application.
+     * @return An {@link Lwjgl3Application} instance with the game.
+     */
     private static Lwjgl3Application createApplication() {
-        return new Lwjgl3Application(new Clone2048(), getDefaultConfiguration());
+        Clone2048 game = Clone2048.getInstance();
+        game.setErrorDisplayer(ERROR_DISPLAYER);
+        return new Lwjgl3Application(game, getDefaultConfiguration());
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
