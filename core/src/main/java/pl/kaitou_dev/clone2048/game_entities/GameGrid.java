@@ -334,36 +334,53 @@ public class GameGrid implements Disposable {
         if (direction == Directions.DOWN || direction == Directions.RIGHT)
             primaryStream = MathNumUtils.reverseIntStream(primaryStream);
 
-        primaryStream = primaryStream.skip(1);
+        primaryStream = primaryStream.skip(1); // The direction-most row/column will not move, so we can skip it.
 
         primaryStream.forEach(primaryIdx -> {
             IntStream secondaryStream = IntStream.range(0, GRID_SIDE).parallel();
             secondaryStream.forEach(secondaryIdx -> {
-                NumberBox consideredBox = isVertical ? grid[primaryIdx][secondaryIdx] : grid[secondaryIdx][primaryIdx];
+                NumberBox consideredBox;
+                synchronized (grid) {
+                    consideredBox = isVertical ? grid[primaryIdx][secondaryIdx] : grid[secondaryIdx][primaryIdx];
+                }
+
                 if (consideredBox == null) return;
 
-                if (isVertical) grid[primaryIdx][secondaryIdx] = null;
-                else grid[secondaryIdx][primaryIdx] = null;
+                synchronized (grid) {
+                    if (isVertical) grid[primaryIdx][secondaryIdx] = null;
+                    else grid[secondaryIdx][primaryIdx] = null;
+                }
 
                 int newIdx = primaryIdx;
 
                 for (int distance = 1; indexWithinBounds(primaryIdx + distance * distMultiplier); ++distance) {
                     newIdx = primaryIdx + distance * distMultiplier;
-                    NumberBox otherBox = isVertical ? grid[newIdx][secondaryIdx] : grid[secondaryIdx][newIdx];
+                    NumberBox otherBox;
+                    synchronized (grid) {
+                        otherBox = isVertical ? grid[newIdx][secondaryIdx] : grid[secondaryIdx][newIdx];
+                    }
 
                     if (otherBox != null) {
                         if (otherBox.equals(consideredBox) && !boxesToUpgrade.contains(otherBox)) {
-                            boxesToUpgrade.add(otherBox);
-                            boxesToRemove.add(consideredBox);
+                            synchronized (boxesToUpgrade) {
+                                boxesToUpgrade.add(otherBox);
+                            }
+                            synchronized (boxesToRemove) {
+                                boxesToRemove.add(consideredBox);
+                            }
                         } else {
                             newIdx -= distMultiplier;
-                            if (isVertical) grid[newIdx][secondaryIdx] = consideredBox;
-                            else grid[secondaryIdx][newIdx] = consideredBox;
+                            synchronized (grid) {
+                                if (isVertical) grid[newIdx][secondaryIdx] = consideredBox;
+                                else grid[secondaryIdx][newIdx] = consideredBox;
+                            }
                         }
                         break;
                     } else if (indexAtBound(newIdx)) {
-                        if (isVertical) grid[newIdx][secondaryIdx] = consideredBox;
-                        else grid[secondaryIdx][newIdx] = consideredBox;
+                        synchronized (grid) {
+                            if (isVertical) grid[newIdx][secondaryIdx] = consideredBox;
+                            else grid[secondaryIdx][newIdx] = consideredBox;
+                        }
                     }
                 }
 
@@ -421,13 +438,10 @@ public class GameGrid implements Disposable {
                 NumberBox neighbor = getNeighbor(r, c, direction);
 
                 // Check if movement is possible:
-                // 1. The neighbor exists and is empty
+                // It cannot be at the boundary, and has to meet one of these conditions:
+                // 1. The neighbor cell is empty
                 // 2. The neighbor exists and has the same value (merge possible)
-                if (!boundaryAchieved && (neighbor == null || neighbor.equals(consideredBox))) {
-                    return true;
-                }
-
-                return false;
+                return !boundaryAchieved && (neighbor == null || neighbor.equals(consideredBox));
             })
         );
     }
@@ -698,7 +712,11 @@ public class GameGrid implements Disposable {
     public boolean isValueOnBoard(int value) {
         if (!MathNumUtils.isPowerOfTwo(value)) return false;
 
-        return Stream.of(grid).flatMap(Stream::of).filter(Objects::nonNull).anyMatch(box -> box.getValue() == value);
+        return Stream.of(grid)
+            .flatMap(Stream::of)
+            .filter(Objects::nonNull)
+            .parallel()
+            .anyMatch(box -> box.getValue() == value);
     }
 
     /**
