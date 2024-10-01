@@ -21,7 +21,7 @@ public class Clone2048 extends Game {
     /**
      * The platform dependent implementation of {@link ErrorDisplayer}. Prints stack-trace unless overridden.
      */
-    private static ErrorDisplayer errorDisplayer = new ErrorDisplayer() {
+    private ErrorDisplayer errorDisplayer = new ErrorDisplayer() {
         @Override
         public void displayError(String title, String message) {
             RuntimeException exception = new RuntimeException(title + ": " + message);
@@ -32,7 +32,7 @@ public class Clone2048 extends Game {
     /**
      * The platform dependent implementation of {@link Confirmer}. Always declines unless overridden.
      */
-    private static Confirmer confirmer = new Confirmer() {
+    private Confirmer confirmer = new Confirmer() {
         @Override
         public boolean askConfirm(String message) {
             return false;
@@ -87,8 +87,6 @@ public class Clone2048 extends Game {
         AudioUtils.dispose();
     }
 
-
-
     /**
      * Gets the instance of the {@code Clone2048} object.
      * @return The instance of the {@code Clone2048} object.
@@ -106,7 +104,7 @@ public class Clone2048 extends Game {
      * @param errorDisplayer The {@code ErrorDisplayer} implementation to override the current one with.
      */
     public void setErrorDisplayer(ErrorDisplayer errorDisplayer) {
-        Clone2048.errorDisplayer = errorDisplayer;
+        this.errorDisplayer = errorDisplayer;
     }
 
     /**
@@ -114,7 +112,7 @@ public class Clone2048 extends Game {
      * @param confirmer The {@code Confirmer} implementation to overrite the current one with.
      */
     public void setConfirmer(Confirmer confirmer) {
-        Clone2048.confirmer = confirmer;
+        this.confirmer = confirmer;
     }
 
     /**
