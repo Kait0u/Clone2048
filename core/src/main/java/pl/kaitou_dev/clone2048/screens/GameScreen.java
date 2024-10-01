@@ -1,6 +1,8 @@
 package pl.kaitou_dev.clone2048.screens;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -16,9 +18,9 @@ import pl.kaitou_dev.clone2048.utils.AudioUtils;
  */
 public class GameScreen implements Screen {
     /**
-     * The {@link Game} instance, required for switching between the screens.
+     * The {@link Game} instance (specialized as {@link Clone2048}), required for switching between the screens.
      */
-    private final Game game;
+    private final Clone2048 game;
 
     /**
      * The {@link Camera} for graphics.
@@ -90,14 +92,20 @@ public class GameScreen implements Screen {
     private void update(float delta) {
         gameGrid.update(delta);
 
-        if (gameGrid.isGameOver()) {
-            game.setScreen(new ResultsScreen(gameGrid, Constants.GameResult.GAME_OVER));
-            dispose();
 
-        } else if (gameGrid.isVictory()) {
-            game.setScreen(new ResultsScreen(gameGrid, Constants.GameResult.VICTORY));
-            dispose();
-        }
+        if (gameGrid.isGameOver())
+            goToResults(Constants.GameResult.GAME_OVER);
+        else if (gameGrid.isVictory())
+            goToResults(Constants.GameResult.VICTORY);
+    }
+
+    /**
+     * Goes to the results screen with a specified result.
+     * @param result The result of a game, specified by {@link Constants.GameResult}
+     */
+    private void goToResults(Constants.GameResult result) {
+        game.setScreen(new ResultsScreen(gameGrid, result));
+        dispose();
     }
 
     /**
@@ -105,6 +113,15 @@ public class GameScreen implements Screen {
      */
     private void handleInput() {
         gameGrid.handleInput();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            handleQuit();
+        }
+    }
+
+    private void handleQuit() {
+        if (game.askConfirm("Are you sure you want to give up?"))
+            goToResults(Constants.GameResult.GAME_OVER);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package pl.kaitou_dev.clone2048.utils.platform_specific;
 
 /**
- * Describes an interface of a class that will be used for displaying errors.
+ * Describes the interface of a class that will be used for displaying errors.
  */
 public interface ErrorDisplayer {
     /**

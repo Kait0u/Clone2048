@@ -30,9 +30,9 @@ public class FirstScreen implements Screen {
     private final static float ANIMATION_INTERVAL_SECONDS = 1.0f;
 
     /**
-     * The {@link Game} instance, required for switching between the screens.
+     * The {@link Game} instance (specialized as {@link Clone2048}), required for switching between the screens.
      */
-    private final Game game;
+    private final Clone2048 game;
 
     /**
      * The {@link Camera} for graphics.
@@ -224,6 +224,18 @@ public class FirstScreen implements Screen {
             game.setScreen(new GameScreen());
             dispose();
         }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE))
+            exitGame();
+    }
+
+    /**
+     * Prompts the user if they want to quit the game, and quits the game if the user confirms that decision.
+     * Does nothing else if declined.
+     */
+    public void exitGame() {
+        if (game.askConfirm("Are you sure you want to exit?"))
+            Gdx.app.exit();
     }
 
     @Override

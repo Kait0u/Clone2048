@@ -3,8 +3,11 @@ package pl.kaitou_dev.clone2048.lwjgl3;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowAdapter;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener;
 import pl.kaitou_dev.clone2048.Clone2048;
 import pl.kaitou_dev.clone2048.Constants;
+import pl.kaitou_dev.clone2048.utils.platform_specific.Confirmer;
 import pl.kaitou_dev.clone2048.utils.platform_specific.ErrorDisplayer;
 
 /** Launches the desktop (LWJGL3) application. */
@@ -18,7 +21,15 @@ public class Lwjgl3Launcher {
      */
     private static final int GAME_DESKTOP_HEIGHT = Constants.GAME_HEIGHT;
 
+    /**
+     * The Lwjgl3 implementation of {@link ErrorDisplayer}.
+     */
     private static final Lwjgl3ErrorDisplayer ERROR_DISPLAYER = new Lwjgl3ErrorDisplayer();
+
+    /**
+     * The Lwjgl3 implementation of {@link Confirmer}.
+     */
+    private static final Confirmer CONFIRMER = new Lwjgl3Confirmer();
 
     /**
      * The entry point to the desktop wrapper for the game.
@@ -26,7 +37,7 @@ public class Lwjgl3Launcher {
      */
     public static void main(String[] args) {
         if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.
-        createApplication();
+        Lwjgl3Application app = createApplication();
     }
 
     /**
@@ -36,6 +47,7 @@ public class Lwjgl3Launcher {
     private static Lwjgl3Application createApplication() {
         Clone2048 game = Clone2048.getInstance();
         game.setErrorDisplayer(ERROR_DISPLAYER);
+        game.setConfirmer(CONFIRMER);
         return new Lwjgl3Application(game, getDefaultConfiguration());
     }
 
@@ -54,6 +66,16 @@ public class Lwjgl3Launcher {
 
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
+
+        configuration.setWindowListener(
+            new Lwjgl3WindowAdapter() {
+                @Override
+                public boolean closeRequested() {
+                    return CONFIRMER.askConfirm("Are you sure you want to exit?");
+                }
+            }
+        );
+
         return configuration;
     }
 }

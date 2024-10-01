@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import pl.kaitou_dev.clone2048.screens.FirstScreen;
 import pl.kaitou_dev.clone2048.utils.AudioUtils;
+import pl.kaitou_dev.clone2048.utils.platform_specific.Confirmer;
 import pl.kaitou_dev.clone2048.utils.platform_specific.ErrorDisplayer;
 
 /**
@@ -18,13 +19,23 @@ public class Clone2048 extends Game {
     private static Clone2048 instance;
 
     /**
-     * The platform dependent implementation of {@link ErrorDisplayer}.
+     * The platform dependent implementation of {@link ErrorDisplayer}. Prints stack-trace unless overridden.
      */
     private static ErrorDisplayer errorDisplayer = new ErrorDisplayer() {
         @Override
         public void displayError(String title, String message) {
             RuntimeException exception = new RuntimeException(title + ": " + message);
             exception.printStackTrace();
+        }
+    };
+
+    /**
+     * The platform dependent implementation of {@link Confirmer}. Always declines unless overridden.
+     */
+    private static Confirmer confirmer = new Confirmer() {
+        @Override
+        public boolean askConfirm(String message) {
+            return false;
         }
     };
 
@@ -76,6 +87,8 @@ public class Clone2048 extends Game {
         AudioUtils.dispose();
     }
 
+
+
     /**
      * Gets the instance of the {@code Clone2048} object.
      * @return The instance of the {@code Clone2048} object.
@@ -97,6 +110,14 @@ public class Clone2048 extends Game {
     }
 
     /**
+     * Sets the {@link Confirmer} implementation - to be used by platform-specific wrappers.
+     * @param confirmer The {@code Confirmer} implementation to overrite the current one with.
+     */
+    public void setConfirmer(Confirmer confirmer) {
+        Clone2048.confirmer = confirmer;
+    }
+
+    /**
      * Handles an exception by displaying it on the screen.
      * @param e The exception to display.
      */
@@ -104,5 +125,14 @@ public class Clone2048 extends Game {
         errorDisplayer.displayError(e);
         dispose();
         Gdx.app.exit();
+    }
+
+    /**
+     * Prompts the user to confirm or decline a certain decision.
+     * @param message The message describing the decision.
+     * @return {@code true} if the user confirms the decision, {@code false} otherwise.
+     */
+    public boolean askConfirm(String message) {
+        return confirmer.askConfirm(message);
     }
 }
