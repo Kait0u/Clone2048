@@ -79,9 +79,9 @@ public class GameScreen implements Screen {
         gameGrid.drawBoxes(spriteBatch);
         spriteBatch.end();
 
-        update(delta);
-
         handleInput();
+
+        update(delta);
     }
 
     /**

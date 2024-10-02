@@ -61,14 +61,14 @@ public class GameGrid implements Disposable {
     private final NumberBox[][] grid;
 
     /**
-     * A list of boxes that will be removed as soon as events related to them have been handled.
+     * A set of boxes that will be removed as soon as events related to them have been handled.
      */
-    private final ArrayList<NumberBox> boxesToRemove;
+    private final HashSet<NumberBox> boxesToRemove;
 
     /**
-     * A list of boxes that will be upgraded as soon as events related to them have been handled.
+     * A set of boxes that will be upgraded as soon as events related to them have been handled.
      */
-    private final ArrayList<NumberBox> boxesToUpgrade;
+    private final HashSet<NumberBox> boxesToUpgrade;
 
     /**
      * A secret number that will allow for dice tests.
@@ -171,8 +171,8 @@ public class GameGrid implements Disposable {
      */
     public GameGrid(boolean showNumbers) {
         grid = new NumberBox[GRID_SIDE][GRID_SIDE];
-        boxesToRemove = new ArrayList<>();
-        boxesToUpgrade = new ArrayList<>();
+        boxesToRemove = new HashSet<>();
+        boxesToUpgrade = new HashSet<>();
         secretNumber = MathNumUtils.randInt(1, 11);
         movementPossibilities = Collections.synchronizedMap(new HashMap<>(){{
             for (Directions direction : Directions.values()) {
@@ -309,11 +309,18 @@ public class GameGrid implements Disposable {
         if (state == State.BUSY) return;
 
         if (movementPossibilities.get(direction)) {
+            System.out.println("Previous: ");
+            System.out.println(this);
             handleMovement(direction);
             NumberBox newBox = addNewBox();
 
             updateLegalMoves();
             state = State.BUSY;
+
+            System.out.println("Current: ");
+            System.out.println(this);
+            System.out.println();
+
         }
     }
 
@@ -325,7 +332,7 @@ public class GameGrid implements Disposable {
     private void handleMovement(Directions direction) {
         boolean isVertical = direction.isVertical();
         boolean isPositive = direction.isPositive();
-        final int distMultiplier = isVertical
+        final int distStep = isVertical
             ? (isPositive ? -1 : 1)
             : (isPositive ? 1 : -1);
 
@@ -336,9 +343,9 @@ public class GameGrid implements Disposable {
 
         primaryStream = primaryStream.skip(1); // The direction-most row/column will not move, so we can skip it.
 
-        primaryStream.forEach(primaryIdx -> {
+        primaryStream.forEachOrdered(primaryIdx -> {
             IntStream secondaryStream = IntStream.range(0, GRID_SIDE).parallel();
-            secondaryStream.forEach(secondaryIdx -> {
+            secondaryStream.forEachOrdered(secondaryIdx -> {
                 NumberBox consideredBox;
                 synchronized (grid) {
                     consideredBox = isVertical ? grid[primaryIdx][secondaryIdx] : grid[secondaryIdx][primaryIdx];
@@ -353,8 +360,9 @@ public class GameGrid implements Disposable {
 
                 int newIdx = primaryIdx;
 
-                for (int distance = 1; indexWithinBounds(primaryIdx + distance * distMultiplier); ++distance) {
-                    newIdx = primaryIdx + distance * distMultiplier;
+                for (int tempIdx = newIdx + distStep; indexWithinBounds(tempIdx); tempIdx += distStep) {
+                    newIdx = tempIdx;
+
                     NumberBox otherBox;
                     synchronized (grid) {
                         otherBox = isVertical ? grid[newIdx][secondaryIdx] : grid[secondaryIdx][newIdx];
@@ -369,7 +377,7 @@ public class GameGrid implements Disposable {
                                 boxesToRemove.add(consideredBox);
                             }
                         } else {
-                            newIdx -= distMultiplier;
+                            newIdx -= distStep;
                             synchronized (grid) {
                                 if (isVertical) grid[newIdx][secondaryIdx] = consideredBox;
                                 else grid[secondaryIdx][newIdx] = consideredBox;

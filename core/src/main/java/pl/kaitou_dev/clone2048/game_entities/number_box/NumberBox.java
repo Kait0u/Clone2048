@@ -7,10 +7,8 @@ import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.game_entities.GameGrid;
 import pl.kaitou_dev.clone2048.game_entities.number_box.actions.BoxAction;
 import pl.kaitou_dev.clone2048.game_entities.number_box.actions.BoxMoveAction;
-import pl.kaitou_dev.clone2048.game_entities.number_box.actions.BoxScaleAction;
 import pl.kaitou_dev.clone2048.utils.MathNumUtils;
 import pl.kaitou_dev.clone2048.utils.timed_actions.Action;
-import pl.kaitou_dev.clone2048.utils.timed_actions.SimultaneousAction;
 import pl.kaitou_dev.clone2048.utils.timed_actions.interpolators.Interpolator;
 
 /**
@@ -156,33 +154,6 @@ public class NumberBox {
      */
     public void actMove(int x, int y, float durationSeconds, Interpolator interpolator) {
         action = new BoxMoveAction(this, x, y, durationSeconds, interpolator);
-    }
-
-    /**
-     * Creates and starts a scaling action for this {@code NumberBox}, to a certain scale value,
-     * within a certain period of time, and with a certain interpolation.
-     * @param scale The new scale.
-     * @param durationSeconds The duration of scaling, measured in seconds.
-     * @param interpolator The {@link Interpolator} used for this scaling action.
-     */
-    public void actScale(double scale, float durationSeconds, Interpolator interpolator) {
-        action = new BoxScaleAction(this, scale, durationSeconds, interpolator);
-    }
-
-    /**
-     * Creates and starts a {@link SimultaneousAction} of {@link BoxMoveAction} and {@link BoxScaleAction} for this
-     * {@code NumberBox}, to certain values, within a certain period of time, and with a certain interpolation.
-     * @param x Thew new X coordinate.
-     * @param y The new Y coordinate.
-     * @param scale The new scale.
-     * @param durationSeconds The duration of this action (as a whole), measured in seconds..
-     * @param interpolator The {@link Interpolator} used for this action.
-     */
-    public void actMoveScale(int x, int y, double scale, float durationSeconds, Interpolator interpolator) {
-        action = new SimultaneousAction(
-            new BoxMoveAction(this, x, y, durationSeconds, interpolator),
-            new BoxScaleAction(this, scale, durationSeconds, interpolator)
-        );
     }
 
     /**
