@@ -1,10 +1,8 @@
 package pl.kaitou_dev.clone2048.lwjgl3;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowAdapter;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener;
 import pl.kaitou_dev.clone2048.Clone2048;
 import pl.kaitou_dev.clone2048.Constants;
 import pl.kaitou_dev.clone2048.utils.platform_specific.Confirmer;

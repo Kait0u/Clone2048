@@ -4,14 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
 import pl.kaitou_dev.clone2048.Constants;
-import pl.kaitou_dev.clone2048.utils.FontUtils;
 import pl.kaitou_dev.clone2048.utils.GraphicsUtils;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Generates and then serves {@link com.badlogic.gdx.graphics.Texture}s for {@link NumberBox}es,
