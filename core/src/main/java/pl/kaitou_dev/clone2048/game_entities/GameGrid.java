@@ -309,18 +309,10 @@ public class GameGrid implements Disposable {
         if (state == State.BUSY) return;
 
         if (movementPossibilities.get(direction)) {
-            System.out.println("Previous: ");
-            System.out.println(this);
             handleMovement(direction);
             NumberBox newBox = addNewBox();
-
             updateLegalMoves();
             state = State.BUSY;
-
-            System.out.println("Current: ");
-            System.out.println(this);
-            System.out.println();
-
         }
     }
 
